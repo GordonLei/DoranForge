@@ -16,7 +16,7 @@ export default function ChampionIndexPage(props) {
         <div className="grid grid-cols-9 gap-4">
           {props.championIconArray.map(({ id, link }, index) => {
             return (
-              <Link href={`/champions/${encodeURIComponent(id)}`}>
+              <Link href={`/champions/${encodeURIComponent(id)}`} key={index}>
                 <img src={link} alt={link} key={index} />
               </Link>
             );
@@ -27,7 +27,7 @@ export default function ChampionIndexPage(props) {
   );
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const championIDArray = await getChampionIDArray(process.env.leaguePatch);
   //  get a list of champion icons
   const championIconArray = championIDArray.map((id) => {
