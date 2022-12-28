@@ -1,4 +1,7 @@
 import axios from "axios";
+/*
+Helper code for DataDragon JSON files
+*/
 
 const ddragonBaseURL = `http://ddragon.leagueoflegends.com/cdn/`;
 
@@ -103,3 +106,13 @@ export const getParsedChampionInfo = async (patchVersion, name) => {
   }
 };
 */
+
+export const formatSkillsAndPassive = (championInfo) => {
+  let unparsedSkills = {};
+  const skillNames = ["Q", "W", "E", "R"];
+  for (let index = 0; index < skillNames.length; index++) {
+    unparsedSkills[skillNames[index]] = championInfo.spells[index];
+  }
+  const unparsedPassive = championInfo.passive;
+  return { unparsedSkills, unparsedPassive };
+};

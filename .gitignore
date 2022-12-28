@@ -40,5 +40,7 @@ jspm_packages
 # DS_Store
 .DS_Store
 
+# stuff I added to the project that should be ignored
 next.config.js
 .env
+data/*

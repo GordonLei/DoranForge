@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import Layout from "../../components/layout";
-import { getChampionInfo, parseStats } from "../../helper/datadragon";
+import {
+  getChampionInfo,
+  parseStats,
+  formatSkillsAndPassive,
+} from "../../helper/datadragon";
 import { objectMapArray } from "../../helper/misc";
 import { round } from "lodash";
 
@@ -9,16 +13,22 @@ function Header({ title }) {
 }
 
 export default function ChampionPage(props) {
+  //  states
   const [stats, setStat] = useState({});
   const [currentLevel, setLevel] = useState(1);
+  const [currentSkills, setSkill] = useState({});
+  const [currentPassive, setPassive] = useState({});
   //  prepare the base level data
   const { baseStats, perLevelStats } = parseStats(props.championInfo.stats);
+  const { unparsedSkills, unparsedPassive } = formatSkillsAndPassive(
+    props.championInfo
+  );
   //  set the stats to baseStats
   useEffect(() => {
     setStat(baseStats);
   }, []);
   //  handle updating stats
-  function handleUpdateStats(newLevel) {
+  function handleLevelUpdateStats(newLevel) {
     console.log("HERE");
     const diffLevel = newLevel - currentLevel;
     setStat({
@@ -48,6 +58,7 @@ export default function ChampionPage(props) {
     });
     setLevel(newLevel);
   }
+
   //  render portion
   return (
     <Layout>
@@ -58,15 +69,13 @@ export default function ChampionPage(props) {
           <div>{props.championInfo.name}</div>
           <div>{props.championInfo.title}</div>
         </div>
-        {/*This section is the stat window*/}
-        {/*Level selector here*/}
+        {/*Level selector*/}
         <div>
           <label htmlFor="level">Current Level:</label>
-
           <select
             name="level"
             id="level"
-            onChange={(event) => handleUpdateStats(event.target.value)}
+            onChange={(event) => handleLevelUpdateStats(event.target.value)}
           >
             {Array.from(Array(18).keys()).map((level) => {
               return (
@@ -77,11 +86,28 @@ export default function ChampionPage(props) {
             })}
           </select>
         </div>
+        {/*Stat Window*/}
         <div className="grid grid-cols-4">
           {objectMapArray(stats, (key, value) => {
             return <div key={`${key}_${value}`}>{`${key} ${value}`}</div>;
           })}
         </div>
+      </div>
+      {/* Passive Description */}
+      <div>
+        <div key={`Passive_name`}> {`Passive: ${unparsedPassive.name}`}</div>
+        <div key={`Passive_tooltip`}> {`${unparsedPassive.tooltip}`}</div>
+      </div>
+      {/* Skill Description */}
+      <div>
+        {objectMapArray(unparsedSkills, (key, value) => {
+          return (
+            <div>
+              <div key={`${key}_name`}> {`${key}: ${value.name}`}</div>
+              <div key={`${key}_tooltip`}> {`${value.tooltip}`}</div>
+            </div>
+          );
+        })}
       </div>
     </Layout>
   );
