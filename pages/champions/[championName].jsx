@@ -3,60 +3,128 @@ import Layout from "../../components/layout";
 import {
   getChampionInfo,
   parseStats,
-  formatSkillsAndPassive,
-} from "../../helper/datadragon";
+  formatAbilities,
+} from "../../helper/lolstaticdata";
 import { objectMapArray } from "../../helper/misc";
+import { growthStatisticCalculation } from "../../helper/lol";
 import { round } from "lodash";
+import { existsSync, readFileSync } from "fs";
 
+//
 function Header({ title }) {
   return <h1>{title ? title : "Default title"}</h1>;
 }
 
 export default function ChampionPage(props) {
-  //  states
-  const [stats, setStat] = useState({});
-  const [currentLevel, setLevel] = useState(1);
-  const [currentSkills, setSkill] = useState({});
-  const [currentPassive, setPassive] = useState({});
-  //  prepare the base level data
+  //
+
+  //  starting states
+  const fa = formatAbilities(props.championInfo.abilities);
   const { baseStats, perLevelStats } = parseStats(props.championInfo.stats);
-  const { unparsedSkills, unparsedPassive } = formatSkillsAndPassive(
-    props.championInfo
-  );
-  //  set the stats to baseStats
-  useEffect(() => {
-    setStat(baseStats);
-  }, []);
+  //  states
+  const [stats, setStat] = useState(baseStats);
+  const [currentLevel, setLevel] = useState(1);
+  const [currentAbilities, setAbility] = useState(fa);
+  //  prepare the base level data
+
   //  handle updating stats
   function handleLevelUpdateStats(newLevel) {
-    console.log("HERE");
-    const diffLevel = newLevel - currentLevel;
+    newLevel = parseInt(newLevel);
     setStat({
-      hp: round(stats.hp + diffLevel * perLevelStats.hpPerLevel, 2),
-      mp: round(stats.mp + diffLevel * perLevelStats.mpPerLevel, 2),
-      armor: round(stats.armor + diffLevel * perLevelStats.armorPerLevel, 2),
-      magicResist: round(
-        stats.magicResist + diffLevel * perLevelStats.magicResistPerLevel,
+      health: round(
+        stats.health +
+          growthStatisticCalculation(
+            perLevelStats.healthPerLevel,
+            currentLevel,
+            newLevel
+          ),
         2
       ),
-      hpRegen: round(
-        stats.hpRegen + diffLevel * perLevelStats.hpRegenPerLevel,
+
+      mana: round(
+        stats.mana +
+          growthStatisticCalculation(
+            perLevelStats.manaPerLevel,
+            currentLevel,
+            newLevel
+          ),
         2
       ),
-      mpRegen: round(
-        stats.mpRegen + diffLevel * perLevelStats.mpRegenPerLevel,
+      armor: round(
+        stats.armor +
+          growthStatisticCalculation(
+            perLevelStats.armorPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      magicResistance: round(
+        stats.magicResistance +
+          growthStatisticCalculation(
+            perLevelStats.magicResistancePerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      healthRegen: round(
+        stats.healthRegen +
+          growthStatisticCalculation(
+            perLevelStats.healthRegenPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      manaRegen: round(
+        stats.manaRegen +
+          growthStatisticCalculation(
+            perLevelStats.manaRegenPerLevel,
+            currentLevel,
+            newLevel
+          ),
         2
       ),
       attackDamage: round(
-        stats.attackDamage + diffLevel * perLevelStats.attackDamagePerLevel,
+        stats.attackDamage +
+          growthStatisticCalculation(
+            perLevelStats.attackDamagePerLevel,
+            currentLevel,
+            newLevel
+          ),
         2
       ),
-      attackSpeed: round(stats.attackSpeed, 2),
-      moveSpeed: round(stats.moveSpeed, 2),
-      attackRange: round(stats.attackRange, 2),
-      crit: round(stats.crit + diffLevel * perLevelStats.critPerLevel, 2),
+      attackSpeed: round(
+        stats.attackSpeed +
+          growthStatisticCalculation(
+            perLevelStats.attackSpeedPerLevel,
+            newLevel
+          ),
+        2
+      ),
+      moveSpeed: round(
+        stats.moveSpeed +
+          growthStatisticCalculation(
+            perLevelStats.moveSpeedPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      attackRange: round(
+        stats.attackRange +
+          growthStatisticCalculation(
+            perLevelStats.attackRangePerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      crit: round(stats.crit, 2),
     });
     setLevel(newLevel);
+    console.log(stats);
   }
 
   //  render portion
@@ -93,17 +161,14 @@ export default function ChampionPage(props) {
           })}
         </div>
       </div>
-      {/* Passive Description */}
-      <div>
-        <div key={`Passive_name`}> {`Passive: ${unparsedPassive.name}`}</div>
-        <div key={`Passive_tooltip`}> {`${unparsedPassive.tooltip}`}</div>
-      </div>
       {/* Skill Description */}
       <div>
-        {objectMapArray(unparsedSkills, (key, value) => {
+        {objectMapArray(currentAbilities, (key, value) => {
           return (
-            <div>
-              <div key={`${key}_name`}> {`${key}: ${value.name}`}</div>
+            <div key={`${key}_skill`}>
+              <div key={`${key}_name`}>
+                {`${key === "P" ? "Passive" : key}: ${value.name}`}
+              </div>
               <div key={`${key}_tooltip`}> {`${value.tooltip}`}</div>
             </div>
           );
@@ -114,10 +179,21 @@ export default function ChampionPage(props) {
 }
 
 export async function getServerSideProps(context) {
-  const championInfo = await getChampionInfo(
-    process.env.leaguePatch,
-    context.params["championName"]
-  );
-  // Pass data to the page via props
-  return { props: { championInfo } };
+  const latestChampionJsonURL =
+    process.cwd() +
+    `/data/lolstaticdata/${process.env.leaguePatch}/champions/${context.params["championName"]}.json`;
+  if (existsSync(latestChampionJsonURL)) {
+    const data = readFileSync(latestChampionJsonURL);
+    const championInfo = JSON.parse(data);
+    //  combineAbilityDescriptions(championInfo.abilities);
+    //  console.log(championInfo);
+    return { props: { championInfo } };
+  } else {
+    const championInfo = await getChampionInfo(
+      process.env.leaguePatch,
+      context.params["championName"]
+    );
+    // Pass data to the page via props
+    return { props: { championInfo } };
+  }
 }
