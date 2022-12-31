@@ -184,6 +184,13 @@ const prepStylize = (
               attribute,
               replacement
             );
+            const keyword = ["total", "maximum"];
+            for (let i = 0; i < keyword.length; i++) {
+              if (attribute.includes(keyword[i])) {
+                modifiedDescription += replacement;
+                break;
+              }
+            }
           });
           return modifiedDescription;
         });
@@ -204,7 +211,6 @@ const prepStylize = (
 
 const lolTextParser = (text, skillButtonName) => {
   const sentence = [];
-  let oldText = text;
   while (text.indexOf("<") !== -1) {
     const startIndex = text.indexOf("<");
     const endIndex = text.indexOf(">");
@@ -230,6 +236,12 @@ const lolTextParser = (text, skillButtonName) => {
 
   return sentence.map(({ format, text }, index) => {
     switch (format) {
+      case findWord(format, "slow"):
+        return (
+          <span className="text-cyan-400" key={`${skillButtonName}_${index}`}>
+            {text}
+          </span>
+        );
       case findWord(format, "magic damage"):
         return (
           <span className="text-blue-700" key={`${skillButtonName}_${index}`}>

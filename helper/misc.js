@@ -19,7 +19,7 @@ export const objectMapArray = (obj, fn) => {
 };
 
 export const caseInsensitiveReplace = (currStr, replaced, replacement) => {
-  const reg = new RegExp(replaced, "gi");
+  const reg = new RegExp(new RegExp(replaced + "s?"), "gi");
   return currStr.replace(reg, replacement);
 };
 

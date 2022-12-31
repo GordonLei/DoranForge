@@ -151,7 +151,7 @@ export default function ChampionPage(props) {
   //  render portion
   return (
     <Layout>
-      <div className="text-red-800">dasdsa</div>
+      <div className="text-yellow-500">dasdsa</div>
       <div>
         {/*This section is the header*/}
         <div>
