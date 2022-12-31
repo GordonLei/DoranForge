@@ -4,6 +4,7 @@ import {
   getChampionInfo,
   parseStats,
   formatAbilities,
+  parse,
 } from "../../helper/lolstaticdata";
 import { objectMapArray } from "../../helper/misc";
 import { growthStatisticCalculation } from "../../helper/lol";
@@ -19,12 +20,19 @@ export default function ChampionPage(props) {
   //
 
   //  starting states
-  const fa = formatAbilities(props.championInfo.abilities);
+  const basePA = {
+    Q: 1,
+    W: 1,
+    E: 1,
+    R: 1,
+  };
+  const fa = parse(props.championInfo.abilities, basePA); // formatAbilities(props.championInfo.abilities);
   const { baseStats, perLevelStats } = parseStats(props.championInfo.stats);
   //  states
   const [stats, setStat] = useState(baseStats);
   const [currentLevel, setLevel] = useState(1);
   const [currentAbilities, setAbility] = useState(fa);
+  const [pointAllocation, setPointAllocation] = useState(basePA);
   //  prepare the base level data
 
   //  handle updating stats
@@ -127,11 +135,24 @@ export default function ChampionPage(props) {
     console.log(stats);
   }
 
+  function handleSkillAlocation(key, numPoints) {
+    console.log(numPoints - 1);
+    setPointAllocation({
+      ...pointAllocation,
+      [key]: numPoints,
+    });
+  }
+
+  //  update the abilities text when pointAllocation is updated
+  useEffect(() => {
+    setAbility(parse(props.championInfo.abilities, pointAllocation));
+  }, [pointAllocation]);
+
   //  render portion
   return (
     <Layout>
+      <div className="text-red-800">dasdsa</div>
       <div>
-        <Header title="Develop. Preview. Ship. 🚀" />
         {/*This section is the header*/}
         <div>
           <div>{props.championInfo.name}</div>
@@ -162,14 +183,38 @@ export default function ChampionPage(props) {
         </div>
       </div>
       {/* Skill Description */}
+
       <div>
         {objectMapArray(currentAbilities, (key, value) => {
           return (
             <div key={`${key}_skill`}>
               <div key={`${key}_name`}>
                 {`${key === "P" ? "Passive" : key}: ${value.name}`}
+                {key !== "P" && (
+                  <select
+                    name="level"
+                    id="level"
+                    key={`${key}_select`}
+                    onChange={(event) =>
+                      handleSkillAlocation(key, event.target.value)
+                    }
+                  >
+                    {Array.from(Array(key === "R" ? 3 : 5).keys()).map(
+                      (level) => {
+                        return (
+                          <option
+                            key={`${key}_level_${level + 1}`}
+                            value={level + 1}
+                          >
+                            {level + 1}
+                          </option>
+                        );
+                      }
+                    )}
+                  </select>
+                )}
               </div>
-              <div key={`${key}_tooltip`}> {`${value.tooltip}`}</div>
+              <div key={`${key}_tooltip`}>{value.tooltip}</div>
             </div>
           );
         })}

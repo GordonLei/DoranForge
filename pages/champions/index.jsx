@@ -12,7 +12,6 @@ export default function ChampionIndexPage(props) {
   return (
     <Layout>
       <div>
-        <Header title="Develop. Preview. Ship. 🚀" />
         <div className="grid grid-cols-9 gap-4">
           {props.championIconArray.map(({ id, link }, index) => {
             return (

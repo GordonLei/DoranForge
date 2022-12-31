@@ -2,7 +2,8 @@
 Helper file for Meraki-Analytics' LoL Static Data
 */
 import axios from "axios";
-import { objectMap } from "./misc";
+import { objectMap, caseInsensitiveReplace, findWord } from "./misc";
+import { find } from "lodash";
 //
 
 /*
@@ -105,7 +106,6 @@ export const formatAbilities = (abilitiesObject) => {
   const combinedDescriptions = combineAbilityDescriptions(abilitiesObject);
   const combinedNames = combineNames(abilitiesObject);
   //  do everything
-
   abilityID.forEach((ability) => {
     formatted[ability] = {
       ...formatAbilities[ability],
@@ -115,7 +115,165 @@ export const formatAbilities = (abilitiesObject) => {
     };
   });
   //  console.log(formatted);
+  console.log(prepStylize(abilitiesObject));
   return formatted;
 };
 
-export const parse = () => {};
+const prepStylize = (
+  abilitiesObject,
+  pointAllocation = {
+    Q: 1,
+    W: 1,
+    E: 1,
+    R: 1,
+  }
+) => {
+  const skillNames = {
+    Q: [],
+    W: [],
+    E: [],
+    R: [],
+    P: [],
+  };
+  const prepped = objectMap(abilitiesObject, (key, value) => {
+    const tooltip = value
+      .map((eachAbilityComponent) => {
+        const skillButtonName = eachAbilityComponent.icon
+          .split("/")
+          .slice(-1)[0]
+          .toUpperCase();
+
+        const allocatedPoints = pointAllocation[skillButtonName];
+        skillNames[skillButtonName].push(eachAbilityComponent.name);
+        /*
+      console.log(
+        "ap",
+        pointAllocation,
+        allocatedPoints,
+        skillButtonName.toUpperCase()
+      );
+      console.log("HERE: ", eachAbilityComponent.effects);
+      */
+        //  recall eachAbilityComponent has an effects array that contains descriptions
+        return eachAbilityComponent.effects.map((eachEffectComponent) => {
+          //  recall eachEffectComponent like {description: ..., leveling:[...], ... }
+          // THIS IS WHERE WE MODIFY THE DESCRIPTIONS
+          let modifiedDescription = eachEffectComponent.description;
+          //  map through the leveling
+          eachEffectComponent.leveling.map((eachLevelComponent) => {
+            //  map through the modifiers based on point allocation
+
+            const attribute = eachLevelComponent.attribute.toLowerCase();
+
+            const modifiers = eachLevelComponent.modifiers.map(
+              (modifierObject) => {
+                //  console.log(modifierObject);
+                return `${modifierObject.values[allocatedPoints - 1]} ${
+                  modifierObject.units[allocatedPoints - 1]
+                }`;
+              }
+            );
+            //  console.log(modifiers);
+            //  replace the attribute with the modifiers
+            const replacement = `<${attribute}> ${modifiers.join(
+              " + "
+            )} </${attribute}>`;
+            //  console.log(replacement);
+            modifiedDescription = caseInsensitiveReplace(
+              modifiedDescription,
+              attribute,
+              replacement
+            );
+          });
+          return modifiedDescription;
+        });
+      })
+      .flat(); //  now flatten the outputs
+    return { tooltip };
+  });
+  //  now add the names
+
+  prepped["P"].name = skillNames["P"].join(" ");
+  prepped["Q"].name = skillNames["Q"].join(" ");
+  prepped["W"].name = skillNames["W"].join(" ");
+  prepped["E"].name = skillNames["E"].join(" ");
+  prepped["R"].name = skillNames["R"].join(" ");
+
+  return prepped;
+};
+
+const lolTextParser = (text, skillButtonName) => {
+  const sentence = [];
+  let oldText = text;
+  while (text.indexOf("<") !== -1) {
+    const startIndex = text.indexOf("<");
+    const endIndex = text.indexOf(">");
+    const keyword = text.substring(startIndex + 1, endIndex);
+    //  take anything before the marker and
+    sentence.push({
+      format: "normal",
+      text: text.substring(0, startIndex),
+    });
+    const closer = text.indexOf(`</${keyword}>`);
+    //  push the thing within the text
+    sentence.push({
+      format: keyword,
+      text: text.substring(endIndex + 1, closer) + " " + keyword,
+    });
+    //  add 3 to account for 2 chars of </, 1 char for the space the closing >
+    text = text.substring(closer + keyword.length + 3);
+  }
+  //  push the remainder as normal formatted text
+  sentence.push({ format: "normal", text });
+  console.log("SENTENCE:", sentence);
+  //now create the divs
+
+  return sentence.map(({ format, text }, index) => {
+    switch (format) {
+      case findWord(format, "magic damage"):
+        return (
+          <span className="text-blue-700" key={`${skillButtonName}_${index}`}>
+            {text}
+          </span>
+        );
+      case findWord(format, "physical damage"):
+      case findWord(format, "attack damage"):
+        return (
+          <span className="text-red-800" key={`${skillButtonName}_${index}`}>
+            {text}
+          </span>
+        );
+
+      case findWord(format, "movement speed"):
+        return (
+          <span className="text-yellow-500" key={`${skillButtonName}_${index}`}>
+            {text}
+          </span>
+        );
+      case findWord(format, "normal"):
+      default:
+        return <span key={`${skillButtonName}_${index}`}> {text} </span>;
+    }
+  });
+};
+
+const stylize = (abilitiesObject) => {
+  const skillButonNames = ["P", "Q", "W", "E", "R"];
+  skillButonNames.forEach((name) => {
+    abilitiesObject[name].tooltip = abilitiesObject[name].tooltip.map(
+      (part) => {
+        return lolTextParser(part, name);
+      }
+    );
+  });
+
+  return abilitiesObject;
+};
+
+export const parse = (abilitiesObject, pointAllocation) => {
+  let parsedAO;
+  parsedAO = prepStylize(abilitiesObject, pointAllocation);
+  parsedAO = stylize(parsedAO);
+  //  console.log(parsedAO);
+  return parsedAO;
+};
