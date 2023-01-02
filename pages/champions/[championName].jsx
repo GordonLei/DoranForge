@@ -26,8 +26,9 @@ export default function ChampionPage(props) {
     E: 1,
     R: 1,
   };
-  const fa = parse(props.championInfo.abilities, basePA); // formatAbilities(props.championInfo.abilities);
+
   const { baseStats, perLevelStats } = parseStats(props.championInfo.stats);
+  const fa = parse(props.championInfo.abilities, basePA, baseStats, baseStats); // formatAbilities(props.championInfo.abilities);
   //  states
   const [stats, setStat] = useState(baseStats);
   const [currentLevel, setLevel] = useState(1);
@@ -39,6 +40,7 @@ export default function ChampionPage(props) {
   function handleLevelUpdateStats(newLevel) {
     newLevel = parseInt(newLevel);
     setStat({
+      ...stats,
       health: round(
         stats.health +
           growthStatisticCalculation(
@@ -145,13 +147,18 @@ export default function ChampionPage(props) {
 
   //  update the abilities text when pointAllocation is updated
   useEffect(() => {
-    setAbility(parse(props.championInfo.abilities, pointAllocation));
+    setAbility(
+      parse(props.championInfo.abilities, pointAllocation, stats, baseStats)
+    );
   }, [pointAllocation]);
 
   //  render portion
   return (
     <Layout>
       <div className="text-yellow-500">dasdsa</div>
+      <div className="text-cyan-400">dasdsa</div>
+      <div className="text-blue-700">dasdsa</div>
+      <div className="text-red-800">dasdsa</div>
       <div>
         {/*This section is the header*/}
         <div>

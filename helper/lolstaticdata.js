@@ -2,8 +2,13 @@
 Helper file for Meraki-Analytics' LoL Static Data
 */
 import axios from "axios";
-import { objectMap, caseInsensitiveReplace, findWord } from "./misc";
-import { find } from "lodash";
+import {
+  objectMap,
+  caseInsensitiveReplace,
+  findWord,
+  checkSubset,
+} from "./misc";
+import { round } from "lodash";
 //
 
 /*
@@ -45,6 +50,7 @@ export const parseStats = (stats) => {
     attackSpeed: stats.attackSpeed.flat,
     moveSpeed: stats.movespeed.flat,
     attackRange: stats.attackRange.flat,
+    abilityPower: 0,
     crit: 0,
   };
 
@@ -59,6 +65,7 @@ export const parseStats = (stats) => {
     attackSpeedPerLevel: stats.attackSpeed.perLevel,
     moveSpeedPerLevel: stats.movespeed.perLevel,
     attackRangePerLevel: stats.attackRange.perLevel,
+    abilityPowerPerLevel: 0,
     critPerLevel: 0,
   };
   return { baseStats, perLevelStats };
@@ -115,8 +122,89 @@ export const formatAbilities = (abilitiesObject) => {
     };
   });
   //  console.log(formatted);
-  console.log(prepStylize(abilitiesObject));
+  //  console.log(prepStylize(abilitiesObject));
   return formatted;
+};
+
+const numerize = (
+  text,
+  currentStats = {
+    health: 1,
+    mana: 1,
+    armor: 1,
+    magicResistance: 1,
+    healthRegen: 1,
+    manaRegen: 1,
+    attackDamage: 1,
+    attackSpeed: 1,
+    moveSpeed: 1,
+    attackRange: 1,
+    crit: 0,
+    abilityPower: 0,
+  },
+  baseStats = {
+    health: 1,
+    mana: 1,
+    armor: 1,
+    magicResistance: 1,
+    healthRegen: 1,
+    manaRegen: 1,
+    attackDamage: 1,
+    attackSpeed: 1,
+    moveSpeed: 1,
+    attackRange: 1,
+    crit: 0,
+    abilityPower: 0,
+  }
+) => {
+  const oldText = text;
+  const modifierComponents = oldText.split("+").map((each) => {
+    return each.trim();
+  });
+  const numerizedText = modifierComponents.reduce(
+    (accumulator, currentValue) => {
+      //  if isNaN returns true, then the variable is NOT a valid number
+      console.log(currentValue);
+
+      if (!isNaN(currentValue)) {
+        return accumulator + parseInt(currentValue);
+      } else {
+        const baseArray = currentValue.split(" ");
+        console.log("BA", baseArray);
+        if (checkSubset(baseArray, ["bonus", "ad"])) {
+          return (
+            accumulator +
+            (parseFloat(baseArray[0]) / 100.0) *
+              (currentStats["attackDamage"] - baseStats["attackDamage"])
+          );
+        } else if (checkSubset(baseArray, ["bonus", "ap"])) {
+          return (
+            accumulator +
+            (parseFloat(baseArray[0]) / 100.0) *
+              (currentStats["abilityPower"] - baseStats["abilityPower"])
+          );
+        } else if (checkSubset(baseArray, ["ad"])) {
+          return (
+            accumulator +
+            (parseFloat(baseArray[0]) / 100.0) * currentStats["attackDamage"]
+          );
+        } else if (checkSubset(baseArray, ["ap"])) {
+          console.log(currentStats["abilityPower"]);
+          return (
+            accumulator +
+            (parseFloat(baseArray[0]) / 100.0) * currentStats["abilityPower"]
+          );
+        }
+      }
+    },
+    0
+  );
+  console.log(numerizedText);
+  console.log(modifierComponents);
+  if (!numerizedText) {
+    return oldText;
+  }
+  return `${round(numerizedText, 2)} (or ${oldText})`;
 };
 
 const prepStylize = (
@@ -126,7 +214,9 @@ const prepStylize = (
     W: 1,
     E: 1,
     R: 1,
-  }
+  },
+  currentStats,
+  baseStats
 ) => {
   const skillNames = {
     Q: [],
@@ -168,16 +258,21 @@ const prepStylize = (
             const modifiers = eachLevelComponent.modifiers.map(
               (modifierObject) => {
                 //  console.log(modifierObject);
-                return `${modifierObject.values[allocatedPoints - 1]} ${
+                return `${modifierObject.values[allocatedPoints - 1]}${
                   modifierObject.units[allocatedPoints - 1]
                 }`;
               }
             );
             //  console.log(modifiers);
             //  replace the attribute with the modifiers
-            const replacement = `<${attribute}> ${modifiers.join(
-              " + "
-            )} </${attribute}>`;
+
+            const joinedModifiers = modifiers.join(" + ");
+            const numerizedModifiers = numerize(
+              joinedModifiers,
+              currentStats,
+              baseStats
+            );
+            const replacement = `<${attribute}> ${numerizedModifiers} </${attribute}>`;
             //  console.log(replacement);
             modifiedDescription = caseInsensitiveReplace(
               modifiedDescription,
@@ -231,7 +326,7 @@ const lolTextParser = (text, skillButtonName) => {
   }
   //  push the remainder as normal formatted text
   sentence.push({ format: "normal", text });
-  console.log("SENTENCE:", sentence);
+  //  console.log("SENTENCE:", sentence);
   //now create the divs
 
   return sentence.map(({ format, text }, index) => {
@@ -282,9 +377,20 @@ const stylize = (abilitiesObject) => {
   return abilitiesObject;
 };
 
-export const parse = (abilitiesObject, pointAllocation) => {
+export const parse = (
+  abilitiesObject,
+  pointAllocation,
+  currentStats,
+  baseStats
+) => {
   let parsedAO;
-  parsedAO = prepStylize(abilitiesObject, pointAllocation);
+  parsedAO = prepStylize(
+    abilitiesObject,
+    pointAllocation,
+    currentStats,
+    baseStats
+  );
+  //  parsedAO = convertToStats(parsedAO, stats);
   parsedAO = stylize(parsedAO);
   //  console.log(parsedAO);
   return parsedAO;

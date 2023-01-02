@@ -30,3 +30,13 @@ export const findWord = (base, find) => {
     return base;
   }
 };
+
+export const checkSubset = (baseArray, subsetArray) => {
+  baseArray = baseArray.map((each) => {
+    return each.trim().toLowerCase();
+  });
+  subsetArray = subsetArray.map((each) => {
+    return each.trim().toLowerCase();
+  });
+  return subsetArray.every((val) => baseArray.includes(val));
+};
