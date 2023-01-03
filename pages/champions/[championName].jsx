@@ -17,8 +17,6 @@ function Header({ title }) {
 }
 
 export default function ChampionPage(props) {
-  //
-
   //  starting states
   const basePA = {
     Q: 1,
@@ -26,15 +24,20 @@ export default function ChampionPage(props) {
     E: 1,
     R: 1,
   };
-
+  //  prepare the base level data
   const { baseStats, perLevelStats } = parseStats(props.championInfo.stats);
-  const fa = parse(props.championInfo.abilities, basePA, baseStats, baseStats); // formatAbilities(props.championInfo.abilities);
+  const fa = parse(
+    props.championInfo.name,
+    props.championInfo.abilities,
+    basePA,
+    baseStats,
+    baseStats
+  ); // formatAbilities(props.championInfo.abilities);
   //  states
   const [stats, setStat] = useState(baseStats);
   const [currentLevel, setLevel] = useState(1);
   const [currentAbilities, setAbility] = useState(fa);
   const [pointAllocation, setPointAllocation] = useState(basePA);
-  //  prepare the base level data
 
   //  handle updating stats
   function handleLevelUpdateStats(newLevel) {
@@ -134,11 +137,11 @@ export default function ChampionPage(props) {
       crit: round(stats.crit, 2),
     });
     setLevel(newLevel);
-    console.log(stats);
+    //  console.log(stats);
   }
 
   function handleSkillAlocation(key, numPoints) {
-    console.log(numPoints - 1);
+    //  console.log(numPoints - 1);
     setPointAllocation({
       ...pointAllocation,
       [key]: numPoints,
@@ -148,9 +151,15 @@ export default function ChampionPage(props) {
   //  update the abilities text when pointAllocation is updated
   useEffect(() => {
     setAbility(
-      parse(props.championInfo.abilities, pointAllocation, stats, baseStats)
+      parse(
+        props.championInfo.name,
+        props.championInfo.abilities,
+        pointAllocation,
+        stats,
+        baseStats
+      )
     );
-  }, [pointAllocation]);
+  }, [pointAllocation, stats]);
 
   //  render portion
   return (
@@ -158,6 +167,7 @@ export default function ChampionPage(props) {
       <div className="text-yellow-500">dasdsa</div>
       <div className="text-cyan-400">dasdsa</div>
       <div className="text-blue-700">dasdsa</div>
+      <div className="text-green-700">dasdsa</div>
       <div className="text-red-800">dasdsa</div>
       <div>
         {/*This section is the header*/}
@@ -221,7 +231,11 @@ export default function ChampionPage(props) {
                   </select>
                 )}
               </div>
-              <div key={`${key}_tooltip`}>{value.tooltip}</div>
+              <div key={`${key}_tooltip`}>
+                {value.tooltip.map((each, index) => {
+                  return <div key={`${key}_tooltip_${index}`}>{each}</div>;
+                })}
+              </div>
             </div>
           );
         })}

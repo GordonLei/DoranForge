@@ -164,13 +164,13 @@ const numerize = (
   const numerizedText = modifierComponents.reduce(
     (accumulator, currentValue) => {
       //  if isNaN returns true, then the variable is NOT a valid number
-      console.log(currentValue);
+      //  console.log(currentValue);
 
       if (!isNaN(currentValue)) {
         return accumulator + parseInt(currentValue);
       } else {
         const baseArray = currentValue.split(" ");
-        console.log("BA", baseArray);
+        //  console.log("BA", baseArray);
         if (checkSubset(baseArray, ["bonus", "ad"])) {
           return (
             accumulator +
@@ -189,7 +189,7 @@ const numerize = (
             (parseFloat(baseArray[0]) / 100.0) * currentStats["attackDamage"]
           );
         } else if (checkSubset(baseArray, ["ap"])) {
-          console.log(currentStats["abilityPower"]);
+          //  console.log(currentStats["abilityPower"]);
           return (
             accumulator +
             (parseFloat(baseArray[0]) / 100.0) * currentStats["abilityPower"]
@@ -199,15 +199,29 @@ const numerize = (
     },
     0
   );
-  console.log(numerizedText);
-  console.log(modifierComponents);
+  //  console.log(numerizedText);
+  //  console.log(modifierComponents);
   if (!numerizedText) {
     return oldText;
   }
   return `${round(numerizedText, 2)} (or ${oldText})`;
 };
 
+const modifyAttribute = (championName, attribute) => {
+  //  check for special cases
+  if (
+    (attribute.includes("cast damage") ||
+      attribute.includes("sweetspot damage") ||
+      attribute.includes("total")) &&
+    championName === "Aatrox"
+  ) {
+    return attribute.replace("damage", "") + "physical damage";
+  }
+  return attribute;
+};
+
 const prepStylize = (
+  championName,
   abilitiesObject,
   pointAllocation = {
     Q: 1,
@@ -232,18 +246,8 @@ const prepStylize = (
           .split("/")
           .slice(-1)[0]
           .toUpperCase();
-
         const allocatedPoints = pointAllocation[skillButtonName];
         skillNames[skillButtonName].push(eachAbilityComponent.name);
-        /*
-      console.log(
-        "ap",
-        pointAllocation,
-        allocatedPoints,
-        skillButtonName.toUpperCase()
-      );
-      console.log("HERE: ", eachAbilityComponent.effects);
-      */
         //  recall eachAbilityComponent has an effects array that contains descriptions
         return eachAbilityComponent.effects.map((eachEffectComponent) => {
           //  recall eachEffectComponent like {description: ..., leveling:[...], ... }
@@ -253,7 +257,13 @@ const prepStylize = (
           eachEffectComponent.leveling.map((eachLevelComponent) => {
             //  map through the modifiers based on point allocation
 
-            const attribute = eachLevelComponent.attribute.toLowerCase();
+            const attribute = modifyAttribute(
+              championName,
+              eachLevelComponent.attribute.toLowerCase()
+            );
+
+            //  const attribute = eachLevelComponent.attribute.toLowerCase();
+            //  console.log(attribute);
 
             const modifiers = eachLevelComponent.modifiers.map(
               (modifierObject) => {
@@ -272,6 +282,7 @@ const prepStylize = (
               currentStats,
               baseStats
             );
+
             const replacement = `<${attribute}> ${numerizedModifiers} </${attribute}>`;
             //  console.log(replacement);
             modifiedDescription = caseInsensitiveReplace(
@@ -279,10 +290,17 @@ const prepStylize = (
               attribute,
               replacement
             );
-            const keyword = ["total", "maximum"];
+            const keyword = [
+              "total",
+              "maximum",
+              "cast",
+              "sweetspot",
+              "healing",
+            ];
+            //  console.log(attribute);
             for (let i = 0; i < keyword.length; i++) {
               if (attribute.includes(keyword[i])) {
-                modifiedDescription += replacement;
+                modifiedDescription += `<seperate> ${replacement} </seperate> `;
                 break;
               }
             }
@@ -307,18 +325,32 @@ const prepStylize = (
 const lolTextParser = (text, skillButtonName) => {
   const sentence = [];
   while (text.indexOf("<") !== -1) {
-    const startIndex = text.indexOf("<");
-    const endIndex = text.indexOf(">");
-    const keyword = text.substring(startIndex + 1, endIndex);
+    let startIndex = text.indexOf("<");
+    let endIndex = text.indexOf(">");
+    let keyword = text.substring(startIndex + 1, endIndex);
+    let seperateFlag = false;
     //  take anything before the marker and
     sentence.push({
       format: "normal",
       text: text.substring(0, startIndex),
     });
+
+    if (keyword === "seperate") {
+      sentence.push({
+        format: "seperate",
+        text: "",
+      });
+      text = text.replace("<seperate>", "").replace("</seperate>", "");
+      startIndex = text.indexOf("<");
+      endIndex = text.indexOf(">");
+      keyword = text.substring(startIndex + 1, endIndex);
+      seperateFlag = true;
+    }
+
     const closer = text.indexOf(`</${keyword}>`);
     //  push the thing within the text
     sentence.push({
-      format: keyword,
+      format: seperateFlag ? `seperate ${keyword}` : keyword,
       text: text.substring(endIndex + 1, closer) + " " + keyword,
     });
     //  add 3 to account for 2 chars of </, 1 char for the space the closing >
@@ -330,33 +362,57 @@ const lolTextParser = (text, skillButtonName) => {
   //now create the divs
 
   return sentence.map(({ format, text }, index) => {
+    const potentialClass = format.includes("seperate") ? " seperateStat " : "";
     switch (format) {
+      case findWord(format, "heal"):
+        return (
+          <span
+            className={`text-green-700 ${potentialClass}`}
+            key={`${skillButtonName}_${index}`}
+          >
+            {text}
+          </span>
+        );
       case findWord(format, "slow"):
         return (
-          <span className="text-cyan-400" key={`${skillButtonName}_${index}`}>
+          <span
+            className={`text-cyan-400 ${potentialClass}`}
+            key={`${skillButtonName}_${index}`}
+          >
             {text}
           </span>
         );
       case findWord(format, "magic damage"):
         return (
-          <span className="text-blue-700" key={`${skillButtonName}_${index}`}>
+          <span
+            className={`text-blue-700 ${potentialClass}`}
+            key={`${skillButtonName}_${index}`}
+          >
             {text}
           </span>
         );
       case findWord(format, "physical damage"):
       case findWord(format, "attack damage"):
         return (
-          <span className="text-red-800" key={`${skillButtonName}_${index}`}>
+          <span
+            className={`text-red-800 ${potentialClass}`}
+            key={`${skillButtonName}_${index}`}
+          >
             {text}
           </span>
         );
 
       case findWord(format, "movement speed"):
         return (
-          <span className="text-yellow-500" key={`${skillButtonName}_${index}`}>
+          <span
+            className={`text-yellow-500 ${potentialClass}`}
+            key={`${skillButtonName}_${index}`}
+          >
             {text}
           </span>
         );
+      case findWord(format, "seperate"):
+        return <br key={`${skillButtonName}_${index}`}></br>;
       case findWord(format, "normal"):
       default:
         return <span key={`${skillButtonName}_${index}`}> {text} </span>;
@@ -378,6 +434,7 @@ const stylize = (abilitiesObject) => {
 };
 
 export const parse = (
+  championName,
   abilitiesObject,
   pointAllocation,
   currentStats,
@@ -385,6 +442,7 @@ export const parse = (
 ) => {
   let parsedAO;
   parsedAO = prepStylize(
+    championName,
     abilitiesObject,
     pointAllocation,
     currentStats,

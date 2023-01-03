@@ -5,6 +5,9 @@ Helper code for DataDragon JSON files
 
 const ddragonBaseURL = `http://ddragon.leagueoflegends.com/cdn/`;
 
+/*
+Retrieve data from ddragon's champion.json
+*/
 export const getChampionJson = async (patchVersion) => {
   const ddragonChampionJsonURL = `${ddragonBaseURL}${patchVersion}/data/en_US/champion.json`;
   return await axios
@@ -23,6 +26,9 @@ export const getChampionJson = async (patchVersion) => {
     });
 };
 
+/*
+Return an array with the names of the Champions from champions.json
+*/
 export const getChampionNamesArray = async (patchVersion) => {
   const data = await getChampionJson(patchVersion);
   const nameArray = [];
@@ -33,6 +39,8 @@ export const getChampionNamesArray = async (patchVersion) => {
 };
 
 /*
+Return an array with the IDs of the Champions from champions.json
+
 Champion ID is the parsed name 
 */
 export const getChampionIDArray = async (patchVersion) => {
@@ -45,7 +53,7 @@ export const getChampionIDArray = async (patchVersion) => {
 };
 
 /*
-get the related champion data from the JSON
+get the related champion data from their respective JSON
 */
 export const getChampionInfo = async (patchVersion, name) => {
   const ddragonChampionURL = `${ddragonBaseURL}${patchVersion}/data/en_US/champion/${name}.json`;
@@ -53,8 +61,6 @@ export const getChampionInfo = async (patchVersion, name) => {
     .get(ddragonChampionURL)
     //  get the data field from response's data
     .then((response) => {
-      //  console.log(JSON.parse(JSON.stringify(response.data.data[name])));
-      //  return JSON.parse(JSON.stringify(response.data.data[name]));
       return response.data.data[name];
     })
     .catch((err) => {
@@ -94,18 +100,6 @@ export const parseStats = (stats) => {
   };
   return { baseStats, perLevelStats };
 };
-/*
-export const getParsedChampionInfo = async (patchVersion, name) => {
-  const championInfo = await getChampionInfo(patchVersion, na);
-  return {
-    name: championInfo.name,
-    title: championInfo.title,
-    image: championInfo.image, 
-    tags: championInfo.tags,
-
-  }
-};
-*/
 
 export const formatSkillsAndPassive = (championInfo) => {
   let unparsedSkills = {};
