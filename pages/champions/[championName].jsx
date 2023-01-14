@@ -4,7 +4,7 @@ import {
   getChampionInfo,
   parseStats,
   formatAbilities,
-  parse,
+  parse
 } from "../../helper/lolstaticdata";
 import { objectMapArray } from "../../helper/misc";
 import { growthStatisticCalculation } from "../../helper/lol";
@@ -22,7 +22,7 @@ export default function ChampionPage(props) {
     Q: 1,
     W: 1,
     E: 1,
-    R: 1,
+    R: 1
   };
   //  prepare the base level data
   const { baseStats, perLevelStats } = parseStats(props.championInfo.stats);
@@ -134,17 +134,17 @@ export default function ChampionPage(props) {
           ),
         2
       ),
-      crit: round(stats.crit, 2),
+      crit: round(stats.crit, 2)
     });
     setLevel(newLevel);
     //  console.log(stats);
   }
 
-  function handleSkillAlocation(key, numPoints) {
+  function handleSkillAllocation(key, numPoints) {
     //  console.log(numPoints - 1);
     setPointAllocation({
       ...pointAllocation,
-      [key]: numPoints,
+      [key]: numPoints
     });
   }
 
@@ -164,81 +164,125 @@ export default function ChampionPage(props) {
   //  render portion
   return (
     <Layout>
-      <div className="text-yellow-500">dasdsa</div>
-      <div className="text-cyan-400">dasdsa</div>
-      <div className="text-blue-700">dasdsa</div>
-      <div className="text-green-700">dasdsa</div>
-      <div className="text-red-800">dasdsa</div>
-      <div>
-        {/*This section is the header*/}
+      <div className="flex flex-row">
         <div>
-          <div>{props.championInfo.name}</div>
-          <div>{props.championInfo.title}</div>
-        </div>
-        {/*Level selector*/}
-        <div>
-          <label htmlFor="level">Current Level:</label>
-          <select
-            name="level"
-            id="level"
-            onChange={(event) => handleLevelUpdateStats(event.target.value)}
-          >
-            {Array.from(Array(18).keys()).map((level) => {
-              return (
-                <option key={`level_${level + 1}`} value={level + 1}>
-                  {level + 1}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-        {/*Stat Window*/}
-        <div className="grid grid-cols-4">
-          {objectMapArray(stats, (key, value) => {
-            return <div key={`${key}_${value}`}>{`${key} ${value}`}</div>;
-          })}
-        </div>
-      </div>
-      {/* Skill Description */}
-
-      <div>
-        {objectMapArray(currentAbilities, (key, value) => {
-          return (
-            <div key={`${key}_skill`}>
-              <div key={`${key}_name`}>
-                {`${key === "P" ? "Passive" : key}: ${value.name}`}
-                {key !== "P" && (
-                  <select
-                    name="level"
-                    id="level"
-                    key={`${key}_select`}
-                    onChange={(event) =>
-                      handleSkillAlocation(key, event.target.value)
-                    }
-                  >
-                    {Array.from(Array(key === "R" ? 3 : 5).keys()).map(
-                      (level) => {
-                        return (
-                          <option
-                            key={`${key}_level_${level + 1}`}
-                            value={level + 1}
-                          >
-                            {level + 1}
-                          </option>
-                        );
-                      }
-                    )}
-                  </select>
-                )}
+          <div className="text-yellow-500">dasdsa</div>
+          <div className="text-cyan-400">dasdsa</div>
+          <div className="text-blue-700">dasdsa</div>
+          <div className="text-green-700">dasdsa</div>
+          <div className="text-red-800">dasdsa</div>
+          <div className="flex flex-row  place-content-center ">
+            {/*This section is the header*/}
+            <div>
+              <div>
+                <img
+                  src={`${props.championInfo.icon}`}
+                  alt={props.championInfo.name}
+                />
               </div>
-              <div key={`${key}_tooltip`}>
-                {value.tooltip.map((each, index) => {
-                  return <div key={`${key}_tooltip_${index}`}>{each}</div>;
-                })}
+              <div>{props.championInfo.name}</div>
+              <div>{props.championInfo.title}</div>
+              {/*Level selector*/}
+              <div>
+                <label htmlFor="level">Current Level:</label>
+                <select
+                  name="level"
+                  id="level"
+                  onChange={(event) =>
+                    handleLevelUpdateStats(event.target.value)
+                  }
+                >
+                  {Array.from(Array(18).keys()).map((level) => {
+                    return (
+                      <option key={`level_${level + 1}`} value={level + 1}>
+                        {level + 1}
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
             </div>
-          );
-        })}
+            {/*Stat Window*/}
+            <div className="grid grid-cols-4 ">
+              {objectMapArray(stats, (key, value) => {
+                return <div key={`${key}_${value}`}>{`${key} ${value}`}</div>;
+              })}
+            </div>
+          </div>
+          {/* Skill Description */}
+
+          <div>
+            {objectMapArray(currentAbilities, (key, value) => {
+              return (
+                <div key={`${key}_skill`} className="border-t-2 m-4">
+                  <div key={`${key}_name`}>
+                    {`${key === "P" ? "Passive" : key}: ${value.name}`}
+                    {key !== "P" && (
+                      <select
+                        name="level"
+                        id="level"
+                        key={`${key}_select`}
+                        onChange={(event) =>
+                          handleSkillAllocation(key, event.target.value)
+                        }
+                      >
+                        {Array.from(Array(key === "R" ? 3 : 5).keys()).map(
+                          (level) => {
+                            return (
+                              <option
+                                key={`${key}_level_${level + 1}`}
+                                value={level + 1}
+                              >
+                                {level + 1}
+                              </option>
+                            );
+                          }
+                        )}
+                      </select>
+                    )}
+                  </div>
+                  <div key={`${key}_tooltip`}>
+                    {value.tooltip.map((each, index) => {
+                      return <div key={`${key}_tooltip_${index}`}>{each}</div>;
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="h-1/2 sticky top-1/4  content-center">
+          {/* Item Section */}
+          <img
+            src={`${props.championInfo.icon}`}
+            alt={props.championInfo.name}
+            className="sticky right-0"
+          />
+          <img
+            src={`${props.championInfo.icon}`}
+            alt={props.championInfo.name}
+          />
+          <img
+            src={`${props.championInfo.icon}`}
+            alt={props.championInfo.name}
+          />
+          <img
+            src={`${props.championInfo.icon}`}
+            alt={props.championInfo.name}
+          />
+          <img
+            src={`${props.championInfo.icon}`}
+            alt={props.championInfo.name}
+          />
+          <img
+            src={`${props.championInfo.icon}`}
+            alt={props.championInfo.name}
+          />
+          <img
+            src={`${props.championInfo.icon}`}
+            alt={props.championInfo.name}
+          />
+        </div>
       </div>
     </Layout>
   );
