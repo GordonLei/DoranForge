@@ -171,7 +171,13 @@ const numerize = (
       } else {
         const baseArray = currentValue.split(" ");
         //  console.log("BA", baseArray);
-        if (checkSubset(baseArray, ["bonus", "ad"])) {
+        if (checkSubset(baseArray, ["ap", "ad"])) {
+          return (
+            accumulator +
+            (parseFloat(baseArray[0]) / 100.0) * currentStats["attackDamage"] +
+            (parseFloat(baseArray[0]) / 100.0) * currentStats["abilityPower"]
+          );
+        } else if (checkSubset(baseArray, ["bonus", "ad"])) {
           return (
             accumulator +
             (parseFloat(baseArray[0]) / 100.0) *
@@ -452,4 +458,33 @@ export const parse = (
   parsedAO = stylize(parsedAO);
   //  console.log(parsedAO);
   return parsedAO;
+};
+
+/*
+
+*/
+
+export const getAllItemInfo = async () => {
+  const lolStaticDataURL = `http://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/items.json`;
+  return await axios
+    .get(lolStaticDataURL)
+    .then((response) => {
+      //  ideally something to save the data into a file + folder
+      const data = response.data;
+      //    for now, just check if the patchVersion matches the version from merakianalytics
+      if (data) {
+        return data;
+      } else {
+        throw new Error("need to consult DDragon");
+      }
+    })
+    .catch((err) => {
+      console.log(
+        "==========\n",
+        "Error in getChampionJson\n",
+        err,
+        "\n",
+        "==========\n"
+      );
+    });
 };

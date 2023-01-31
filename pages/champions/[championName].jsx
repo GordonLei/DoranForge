@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import Layout from "../../components/layout";
+import Inventory from "../../components/inventory";
 import {
-  getChampionInfo,
+  getchampionData,
+  getAllItemInfo,
   parseStats,
   formatAbilities,
   parse
@@ -10,11 +12,6 @@ import { objectMapArray } from "../../helper/misc";
 import { growthStatisticCalculation } from "../../helper/lol";
 import { round } from "lodash";
 import { existsSync, readFileSync } from "fs";
-
-//
-function Header({ title }) {
-  return <h1>{title ? title : "Default title"}</h1>;
-}
 
 export default function ChampionPage(props) {
   //  starting states
@@ -25,20 +22,51 @@ export default function ChampionPage(props) {
     R: 1
   };
   //  prepare the base level data
-  const { baseStats, perLevelStats } = parseStats(props.championInfo.stats);
+  const { baseStats, perLevelStats } = parseStats(props.championData.stats);
   const fa = parse(
-    props.championInfo.name,
-    props.championInfo.abilities,
+    props.championData.name,
+    props.championData.abilities,
     basePA,
     baseStats,
     baseStats
-  ); // formatAbilities(props.championInfo.abilities);
+  ); // formatAbilities(props.championData.abilities);
   //  states
   const [stats, setStat] = useState(baseStats);
   const [currentLevel, setLevel] = useState(1);
   const [currentAbilities, setAbility] = useState(fa);
   const [pointAllocation, setPointAllocation] = useState(basePA);
-
+  const [inventory, setInventory] = useState([
+    {
+      id: -1,
+      name: "blank",
+      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
+    },
+    {
+      id: -1,
+      name: "blank",
+      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
+    },
+    {
+      id: -1,
+      name: "blank",
+      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
+    },
+    {
+      id: -1,
+      name: "blank",
+      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
+    },
+    {
+      id: -1,
+      name: "blank",
+      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
+    },
+    {
+      id: -1,
+      name: "blank",
+      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
+    }
+  ]);
   //  handle updating stats
   function handleLevelUpdateStats(newLevel) {
     newLevel = parseInt(newLevel);
@@ -152,8 +180,8 @@ export default function ChampionPage(props) {
   useEffect(() => {
     setAbility(
       parse(
-        props.championInfo.name,
-        props.championInfo.abilities,
+        props.championData.name,
+        props.championData.abilities,
         pointAllocation,
         stats,
         baseStats
@@ -176,12 +204,12 @@ export default function ChampionPage(props) {
             <div>
               <div>
                 <img
-                  src={`${props.championInfo.icon}`}
-                  alt={props.championInfo.name}
+                  src={`${props.championData.icon}`}
+                  alt={props.championData.name}
                 />
               </div>
-              <div>{props.championInfo.name}</div>
-              <div>{props.championInfo.title}</div>
+              <div>{props.championData.name}</div>
+              <div>{props.championData.title}</div>
               {/*Level selector*/}
               <div>
                 <label htmlFor="level">Current Level:</label>
@@ -251,59 +279,39 @@ export default function ChampionPage(props) {
             })}
           </div>
         </div>
-        <div className="h-1/2 sticky top-1/4  content-center">
-          {/* Item Section */}
-          <img
-            src={`${props.championInfo.icon}`}
-            alt={props.championInfo.name}
-            className="sticky right-0"
-          />
-          <img
-            src={`${props.championInfo.icon}`}
-            alt={props.championInfo.name}
-          />
-          <img
-            src={`${props.championInfo.icon}`}
-            alt={props.championInfo.name}
-          />
-          <img
-            src={`${props.championInfo.icon}`}
-            alt={props.championInfo.name}
-          />
-          <img
-            src={`${props.championInfo.icon}`}
-            alt={props.championInfo.name}
-          />
-          <img
-            src={`${props.championInfo.icon}`}
-            alt={props.championInfo.name}
-          />
-          <img
-            src={`${props.championInfo.icon}`}
-            alt={props.championInfo.name}
-          />
-        </div>
+        <Inventory inventory={inventory} />
       </div>
     </Layout>
   );
 }
 
 export async function getServerSideProps(context) {
+  let itemData;
+  let championData;
+  const latestItemJsonURL =
+    process.cwd() +
+    `/data/lolstaticdata/${process.env.leaguePatch}/champions/${context.params["championName"]}.json`;
+  //
   const latestChampionJsonURL =
     process.cwd() +
     `/data/lolstaticdata/${process.env.leaguePatch}/champions/${context.params["championName"]}.json`;
+
   if (existsSync(latestChampionJsonURL)) {
     const data = readFileSync(latestChampionJsonURL);
-    const championInfo = JSON.parse(data);
-    //  combineAbilityDescriptions(championInfo.abilities);
-    //  console.log(championInfo);
-    return { props: { championInfo } };
+    championData = JSON.parse(data);
   } else {
-    const championInfo = await getChampionInfo(
+    championData = await getchampionData(
       process.env.leaguePatch,
       context.params["championName"]
     );
-    // Pass data to the page via props
-    return { props: { championInfo } };
   }
+  //
+  if (existsSync(latestItemJsonURL)) {
+    const data = readFileSync(latestItemJsonURL);
+    itemData = JSON.parse(data);
+  } else {
+    itemData = await getAllItemInfo();
+  }
+  // Pass data to the page via props
+  return { props: { championData, itemData } };
 }
