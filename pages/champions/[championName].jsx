@@ -286,11 +286,10 @@ export default function ChampionPage(props) {
 }
 
 export async function getServerSideProps(context) {
-  let itemData;
+  //  let unparsedItemData;
   let championData;
   const latestItemJsonURL =
-    process.cwd() +
-    `/data/lolstaticdata/${process.env.leaguePatch}/champions/${context.params["championName"]}.json`;
+    process.cwd() + `/data/lolstaticdata/${process.env.leaguePatch}/items.json`;
   //
   const latestChampionJsonURL =
     process.cwd() +
@@ -306,12 +305,7 @@ export async function getServerSideProps(context) {
     );
   }
   //
-  if (existsSync(latestItemJsonURL)) {
-    const data = readFileSync(latestItemJsonURL);
-    itemData = JSON.parse(data);
-  } else {
-    itemData = await getAllItemInfo();
-  }
+
   // Pass data to the page via props
-  return { props: { championData, itemData } };
+  return { props: { championData } };
 }

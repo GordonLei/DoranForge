@@ -44,3 +44,4 @@ jspm_packages
 next.config.js
 .env
 data/*
+json/

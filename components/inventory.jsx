@@ -1,22 +1,25 @@
 import Image from "next/image";
 import Shop from "./shop";
-import Script from "next/script";
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 
-export default function Inventory({ inventory }) {
+export default function Inventory({ inventory, getItemDataMethod }) {
   const buttonOpenShop = useRef(null);
-  const shop = useRef(null);
   //  might have to move this to the shop
   const [showShop, setShopVisibility] = useState(false);
-  const handleClick = (event) => {
+  const handleClick = async (event) => {
     //  show the shop
     setShopVisibility(!showShop);
-    console.log(showShop);
   };
 
   return (
     <div>
-      <div>{showShop && <Shop />}</div>
+      <div className="absolute left-0 ">
+        <div className="flex">
+          <Shop showShop={showShop} />
+
+          <div className="h-1/2 sticky top-1/4  content-center"></div>
+        </div>
+      </div>
 
       <div className="h-1/2 sticky top-1/4  content-center">
         {/* Item Section */}

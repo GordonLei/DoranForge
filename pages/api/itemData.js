@@ -3,18 +3,14 @@ import { promises as fs } from "fs";
 
 export default async function handler(req, res) {
   //Find the absolute path of the data directory
-  const dataDirectory = path.join(
+  const jsonDirectory = path.join(
     process.cwd(),
-    `data/lolstaticdata/12.23.1/`
+    `json/${process.env.leaguePatch}`
+    //  `data/lolstaticdata/12.23.1/`
     //`data/lolstaticdata/${req.body.patchVersion}`
   );
   //Read the json data file data.json
-  const fileContents = await fs.readFile(
-    `${dataDirectory}champions/Akali.json`,
-    //  dataDirectory + "/champions.json",
-    "utf8"
-  );
-  console.log("FILECONTENT", fileContents);
+  const fileContents = await fs.readFile(jsonDirectory + "/items.json", "utf8");
   //Return the content of the data file in json format
   res.status(200).json(fileContents);
 }
