@@ -13,15 +13,15 @@ export default function Inventory({ inventory, getItemDataMethod }) {
 
   return (
     <div>
-      <div className="absolute left-0 ">
+      <div className="absolute left-0 flex">
         <div className="flex">
           <Shop showShop={showShop} />
 
-          <div className="h-1/2 sticky top-1/4  content-center"></div>
+          <div className="sticky top-16 h-20 content-center"></div>
         </div>
       </div>
 
-      <div className="h-1/2 sticky top-1/4  content-center">
+      <div className="sticky top-16  h-20  content-center">
         {/* Item Section */}
         {inventory.map((item, index) => {
           if (item.link) {
