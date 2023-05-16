@@ -21,7 +21,7 @@ export default function Shop({
   showShop,
   getItemDataMethod,
   setStat,
-  currentItems
+  currentItems,
 }) {
   /*
   need something to update stats
@@ -48,7 +48,7 @@ export default function Shop({
       console.log("DONE");
       setParsedItemData(parsedData);
       console.log(parsedData);
-    }
+    },
   });
   //  let itemData;
   //
@@ -136,7 +136,7 @@ export default function Shop({
                 })}
                 {getItemInfo(currItem, "active").map((currentActive) => {
                   return (
-                    <div>
+                    <div key={`${currentActive.name}_effect`}>
                       {currentActive.name}: {currentActive.effects}
                     </div>
                   );

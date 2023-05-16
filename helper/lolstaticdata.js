@@ -6,7 +6,7 @@ import {
   objectMap,
   caseInsensitiveReplace,
   findWord,
-  checkSubset
+  checkSubset,
 } from "./misc";
 import { round } from "lodash";
 //
@@ -51,7 +51,7 @@ export const parseStats = (stats) => {
     moveSpeed: stats.movespeed.flat,
     attackRange: stats.attackRange.flat,
     abilityPower: 0,
-    crit: 0
+    crit: 0,
   };
 
   const perLevelStats = {
@@ -66,7 +66,7 @@ export const parseStats = (stats) => {
     moveSpeedPerLevel: stats.movespeed.perLevel,
     attackRangePerLevel: stats.attackRange.perLevel,
     abilityPowerPerLevel: 0,
-    critPerLevel: 0
+    critPerLevel: 0,
   };
   return { baseStats, perLevelStats };
 };
@@ -118,7 +118,7 @@ export const formatAbilities = (abilitiesObject) => {
       ...formatAbilities[ability],
       name: combinedNames[ability],
       description: combinedDescriptions[ability],
-      tooltip: combinedDescriptions[ability]
+      tooltip: combinedDescriptions[ability],
     };
   });
   //  console.log(formatted);
@@ -140,7 +140,7 @@ const numerize = (
     moveSpeed: 1,
     attackRange: 1,
     crit: 0,
-    abilityPower: 0
+    abilityPower: 0,
   },
   baseStats = {
     health: 1,
@@ -154,7 +154,7 @@ const numerize = (
     moveSpeed: 1,
     attackRange: 1,
     crit: 0,
-    abilityPower: 0
+    abilityPower: 0,
   }
 ) => {
   const oldText = text;
@@ -233,7 +233,7 @@ const prepStylize = (
     Q: 1,
     W: 1,
     E: 1,
-    R: 1
+    R: 1,
   },
   currentStats,
   baseStats
@@ -243,7 +243,7 @@ const prepStylize = (
     W: [],
     E: [],
     R: [],
-    P: []
+    P: [],
   };
   const prepped = objectMap(abilitiesObject, (key, value) => {
     const tooltip = value
@@ -301,7 +301,7 @@ const prepStylize = (
               "maximum",
               "cast",
               "sweetspot",
-              "healing"
+              "healing",
             ];
             //  console.log(attribute);
             for (let i = 0; i < keyword.length; i++) {
@@ -338,13 +338,13 @@ const lolTextParser = (text, skillButtonName) => {
     //  take anything before the marker and
     sentence.push({
       format: "normal",
-      text: text.substring(0, startIndex)
+      text: text.substring(0, startIndex),
     });
 
     if (keyword === "seperate") {
       sentence.push({
         format: "seperate",
-        text: ""
+        text: "",
       });
       text = text.replace("<seperate>", "").replace("</seperate>", "");
       startIndex = text.indexOf("<");
@@ -357,7 +357,7 @@ const lolTextParser = (text, skillButtonName) => {
     //  push the thing within the text
     sentence.push({
       format: seperateFlag ? `seperate ${keyword}` : keyword,
-      text: text.substring(endIndex + 1, closer) + " " + keyword
+      text: text.substring(endIndex + 1, closer) + " " + keyword,
     });
     //  add 3 to account for 2 chars of </, 1 char for the space the closing >
     text = text.substring(closer + keyword.length + 3);
