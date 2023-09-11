@@ -2,13 +2,20 @@ import Image from "next/image";
 import Shop from "./shop";
 import { useState, useRef } from "react";
 
-export default function Inventory({ inventory, getItemDataMethod }) {
+export default function Inventory({
+  inventory,
+  setOverflowScroll,
+  setHidden,
+  getItemDataMethod
+}) {
   const buttonOpenShop = useRef(null);
   //  might have to move this to the shop
   const [showShop, setShopVisibility] = useState(false);
   const handleClick = async (event) => {
     //  show the shop
     setShopVisibility(!showShop);
+    setOverflowScroll(false);
+    setHidden();
   };
 
   return (

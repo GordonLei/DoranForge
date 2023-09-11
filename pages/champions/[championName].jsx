@@ -14,6 +14,15 @@ import { round } from "lodash";
 import { existsSync, readFileSync } from "fs";
 
 export default function ChampionPage(props) {
+  const setHidden = () => {
+    console.log(document.body.style.overflow);
+    if (document.body.style.overflow !== "hidden") {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "scroll";
+    }
+  };
+
   //  starting states
   const basePA = {
     Q: 1,
@@ -35,6 +44,7 @@ export default function ChampionPage(props) {
   const [currentLevel, setLevel] = useState(1);
   const [currentAbilities, setAbility] = useState(fa);
   const [pointAllocation, setPointAllocation] = useState(basePA);
+  const [overflowScroll, setOverflowScroll] = useState(true);
   const [inventory, setInventory] = useState([
     {
       id: -1,
@@ -199,7 +209,13 @@ export default function ChampionPage(props) {
           <div className="text-blue-700">dasdsa</div>
           <div className="text-green-700">dasdsa</div>
           <div className="text-red-800">dasdsa</div>
-          <div className="flex flex-row  place-content-center ">
+          <div
+            className={`flex flex-row  place-content-center ${
+              overflowScroll
+                ? ""
+                : " overflow-y-scroll overscroll-y-none overflow-hidden"
+            }`}
+          >
             {/*This section is the header*/}
             <div>
               <div>
@@ -239,7 +255,13 @@ export default function ChampionPage(props) {
           </div>
           {/* Skill Description */}
 
-          <div>
+          <div
+            className={`${
+              overflowScroll
+                ? ""
+                : " overflow-y-scroll overscroll-y-none overflow-hidden"
+            }`}
+          >
             {objectMapArray(currentAbilities, (key, value) => {
               return (
                 <div key={`${key}_skill`} className="border-t-2 m-4">
@@ -279,7 +301,11 @@ export default function ChampionPage(props) {
             })}
           </div>
         </div>
-        <Inventory inventory={inventory} />
+        <Inventory
+          inventory={inventory}
+          setOverflowScroll={setOverflowScroll}
+          setHidden={setHidden}
+        />
       </div>
     </Layout>
   );

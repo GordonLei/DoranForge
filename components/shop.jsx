@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { getAllItemInfo } from "../helper/lolstaticdata";
 import { objectMapArray } from "../helper/misc";
 import useSWRImmutable from "swr/immutable";
+import { useDispatch, useSelector } from "react-redux";
+//
+import { addItem, removeItem } from "../store/inventorySlice";
 
 //Write a fetcher function to wrap the native fetch function and return the result of a call to url in json format
 const fetcher = (url) =>
@@ -34,6 +37,7 @@ export default function Shop({
     });
     return dataDict;
   };
+  const dispatch = useDispatch();
 
   const [currItem, setCurrItem] = useState(-1);
   const [parsedItemData, setParsedItemData] = useState({});
@@ -56,6 +60,21 @@ export default function Shop({
     console.log("CLICKED", itemId);
     setCurrItem(itemId);
   };
+
+  const handlePurchase = (event, itemId) => {
+    event.stopPropagation();
+    console.log(itemId);
+    console.log(parsedItemData);
+    const item = parsedItemData[itemId];
+    console.log("item, ", item);
+    dispatch(addItem(parsedItemData[itemId]));
+  };
+
+  const handleSell = (event, itemId) => {
+    event.stopPropagation();
+    dispatch(removeItem(itemId));
+  };
+
   //
   const getItemInfo = (id, param) => {
     const item = parsedItemData[id.toString()];
@@ -99,10 +118,10 @@ export default function Shop({
   //Handle the ready state and display the result contained in the data object mapped to the structure of the json file
   if (showShop) {
     return (
-      <div className="">
+      <div className="flex overscroll-auto fixed ">
         {/* This is the shop window */}
         <div className="grid grid-cols-9 gap-2 bg-slate-500">
-          <div className="h-screen   sticky top-16 overflow-y-scroll overscroll-contain col-span-5 grid grid-cols-5 gap-2">
+          <div className="sticky h-screen  top-16 overflow-y-scroll overscroll-contain col-span-5 grid grid-cols-5 gap-2">
             {parsedItemData &&
               Object.values(parsedItemData).map((item) => {
                 return (
@@ -115,7 +134,8 @@ export default function Shop({
                 );
               })}
           </div>
-          <div className="col-span-4">
+          {/* This is the item description */}
+          <div className="sticky w-full col-span-4 pr-32">
             {currItem < 0 || (
               <div>
                 <img
@@ -123,29 +143,43 @@ export default function Shop({
                   alt={`${getItemInfo(currItem, "name")} png`}
                   key={`item_${currItem}`}
                 />
-                {getItemInfo(currItem, "simpleDescription")}
-                {getItemInfo(currItem, "passives").map((currentPassive) => {
+                <div>{getItemInfo(currItem, "name")}</div>
+                <div>{getItemInfo(currItem, "simpleDescription")}</div>
+                {getItemInfo(currItem, "passives").map((currentPassive, id) => {
                   /*
               Need a part to show Mythic Passives
               */
                   return (
-                    <div>
+                    <div key={`${currentPassive.name}-${id}`}>
                       {currentPassive.name}: {currentPassive.effects}
                     </div>
                   );
                 })}
-                {getItemInfo(currItem, "active").map((currentActive) => {
+                {getItemInfo(currItem, "active").map((currentActive, id) => {
                   return (
-                    <div>
+                    <div key={`${currentActive.name}-${id}`}>
                       {currentActive.name}: {currentActive.effects}
                     </div>
                   );
                 })}
+                <div
+                  onClick={(e) => {
+                    handlePurchase(e, getItemInfo(currItem, "id"));
+                  }}
+                >
+                  Purchase
+                </div>
+                <div
+                  onClick={(e) => {
+                    handleSell(e, getItemInfo(currItem, "id"));
+                  }}
+                >
+                  Sell
+                </div>
               </div>
             )}
           </div>
         </div>
-        {/* This is the item description */}
       </div>
     );
   }
