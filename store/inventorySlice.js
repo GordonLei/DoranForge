@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { validateInventory } from "../helper/lolItem";
 
 const initialState = [];
 
@@ -10,7 +11,7 @@ const inventorySlice = createSlice({
     addItem: (state, action) => {
       console.log(action);
       if (state.length < 6) {
-        return [...state, action.payload];
+        return validateInventory(state, action.payload);
       }
     },
     removeItem: (state, action) => {
