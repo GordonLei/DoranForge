@@ -1,6 +1,9 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { getAllItemInfo } from "../helper/lolstaticdata";
+import {
+  getAllItemInfo,
+  extractItemStatFromDict
+} from "../helper/lolstaticdata";
 import { objectMapArray } from "../helper/misc";
 import useSWRImmutable from "swr/immutable";
 import { useDispatch, useSelector } from "react-redux";
@@ -145,6 +148,23 @@ export default function Shop({
                 />
                 <div>{getItemInfo(currItem, "name")}</div>
                 <div>{getItemInfo(currItem, "simpleDescription")}</div>
+
+                {
+                  /*
+                  Need to show the stats 
+                  */
+
+                  // console.log(getItemInfo(currItem, "stats"));
+                  objectMapArray(
+                    extractItemStatFromDict(getItemInfo(currItem, "stats")),
+                    (statName, value) => {
+                      return (
+                        <div key={`${statName}`}>{`${value} ${statName}`}</div>
+                      );
+                    }
+                  )
+                }
+
                 {getItemInfo(currItem, "passives").map((currentPassive, id) => {
                   /*
               Need a part to show Mythic Passives

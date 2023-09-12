@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Layout from "../../components/layout";
 import Inventory from "../../components/inventory";
 import {
-  getchampionData,
+  getChampionInfo,
   getAllItemInfo,
   parseStats,
   formatAbilities,
@@ -325,7 +325,7 @@ export async function getServerSideProps(context) {
     const data = readFileSync(latestChampionJsonURL);
     championData = JSON.parse(data);
   } else {
-    championData = await getchampionData(
+    championData = await getChampionInfo(
       process.env.leaguePatch,
       context.params["championName"]
     );
