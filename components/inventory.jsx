@@ -1,12 +1,17 @@
 import Image from "next/image";
 import Shop from "./shop";
 import { useState, useRef } from "react";
+//
+import { useDispatch, useSelector } from "react-redux";
+import { addItem, inventorySelector } from "../store/inventorySlice";
+import { current } from "@reduxjs/toolkit";
+//
 
 export default function Inventory({
-  inventory,
+  /* inventory, */
   setOverflowScroll,
-  setHidden,
-  getItemDataMethod
+  setHidden
+  /* setInventory */
 }) {
   const buttonOpenShop = useRef(null);
   //  might have to move this to the shop
@@ -17,6 +22,7 @@ export default function Inventory({
     setOverflowScroll(false);
     setHidden();
   };
+  const currentInventory = useSelector(inventorySelector);
 
   return (
     <div>
@@ -30,11 +36,11 @@ export default function Inventory({
 
       <div className="sticky top-16  h-20  content-center">
         {/* Item Section */}
-        {inventory.map((item, index) => {
-          if (item.link) {
+        {currentInventory.map((item, index) => {
+          if (item.icon) {
             return (
               <img
-                src={item.link}
+                src={item.icon}
                 alt={`${item.name} png`}
                 key={`item_${index}`}
               />
@@ -43,7 +49,7 @@ export default function Inventory({
             //  Will have to change this to related code
             return (
               <img
-                src={item.link}
+                src={item.icon}
                 alt={`${item.name} png`}
                 key={`item_${index}`}
               />

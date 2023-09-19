@@ -22,10 +22,13 @@ export const getChampionInfo = async (patchVersion, name) => {
       //  ideally something to save the data into a file + folder
       const data = response.data;
       //    for now, just check if the patchVersion matches the version from merakianalytics
+      console.log("what is this: " + data.icon.split("/")[4]);
       if (data.icon.split("/")[4] === patchVersion) {
         return data;
       } else {
-        throw new Error("need to consult DDragon");
+        throw new Error(
+          "need to consult Merakianalytics; might be a mismatch in Patch # + need to update"
+        );
       }
     })
     .catch((err) => {

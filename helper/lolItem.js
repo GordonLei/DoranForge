@@ -7,3 +7,7 @@ export const validateInventory = (state, newItem) => {
   //  Need to validate any special interactions (ex. no navori + shojin)
   return [...state, newItem];
 };
+
+export const generateInventoryComponentInfo = (state) => {
+  return {};
+};

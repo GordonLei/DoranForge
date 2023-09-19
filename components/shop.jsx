@@ -1,15 +1,23 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { ReactReduxContext } from "react-redux";
+//
 import {
   getAllItemInfo,
   extractItemStatFromDict
 } from "../helper/lolstaticdata";
+import { generateInventoryComponentInfo } from "../helper/lolItem";
+//
 import { objectMapArray } from "../helper/misc";
 import useSWRImmutable from "swr/immutable";
 import { useDispatch, useSelector } from "react-redux";
 //
-import { addItem, removeItem } from "../store/inventorySlice";
-
+import {
+  addItem,
+  removeItem,
+  inventorySelector
+} from "../store/inventorySlice";
+//
 //Write a fetcher function to wrap the native fetch function and return the result of a call to url in json format
 const fetcher = (url) =>
   fetch(url)
@@ -25,6 +33,7 @@ const fetcher = (url) =>
 
 export default function Shop({
   showShop,
+  /* setInventory, */
   getItemDataMethod,
   setStat,
   currentItems
@@ -44,6 +53,9 @@ export default function Shop({
 
   const [currItem, setCurrItem] = useState(-1);
   const [parsedItemData, setParsedItemData] = useState({});
+  //
+
+  //
   //  let itemData;
   //Set up SWR to run the fetcher function when calling "/api/staticdata"
   //There are 3 possible states: (1) loading when data is null (2) ready when the data is returned (3) error when there was an error fetching the data
@@ -71,6 +83,7 @@ export default function Shop({
     const item = parsedItemData[itemId];
     console.log("item, ", item);
     dispatch(addItem(parsedItemData[itemId]));
+    /* setInventory(generateInventoryComponentInfo()); */
   };
 
   const handleSell = (event, itemId) => {

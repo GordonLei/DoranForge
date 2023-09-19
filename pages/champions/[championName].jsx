@@ -45,6 +45,7 @@ export default function ChampionPage(props) {
   const [currentAbilities, setAbility] = useState(fa);
   const [pointAllocation, setPointAllocation] = useState(basePA);
   const [overflowScroll, setOverflowScroll] = useState(true);
+  /*
   const [inventory, setInventory] = useState([
     {
       id: -1,
@@ -77,6 +78,7 @@ export default function ChampionPage(props) {
       link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
     }
   ]);
+  */
   //  handle updating stats
   function handleLevelUpdateStats(newLevel) {
     newLevel = parseInt(newLevel);
@@ -302,9 +304,10 @@ export default function ChampionPage(props) {
           </div>
         </div>
         <Inventory
-          inventory={inventory}
+          /* inventory={inventory} */
           setOverflowScroll={setOverflowScroll}
           setHidden={setHidden}
+          /* setInventory={setInventory} */
         />
       </div>
     </Layout>
@@ -320,7 +323,7 @@ export async function getServerSideProps(context) {
   const latestChampionJsonURL =
     process.cwd() +
     `/data/lolstaticdata/${process.env.leaguePatch}/champions/${context.params["championName"]}.json`;
-
+  console.log(latestChampionJsonURL);
   if (existsSync(latestChampionJsonURL)) {
     const data = readFileSync(latestChampionJsonURL);
     championData = JSON.parse(data);
