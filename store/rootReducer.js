@@ -1,8 +1,10 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import inventory from "./inventorySlice";
+import stats from "./statsSlice";
 
 const rootReducer = combineReducers({
-  inventory
+  inventory,
+  stats
 });
 
 export const store = configureStore({

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { validateInventory } from "../helper/lolItem";
+import { reduxValidateInventory } from "../helper/lolItem";
 
 const initialState = [];
 
@@ -10,9 +10,7 @@ const inventorySlice = createSlice({
     setInventory: (_, action) => [...action.payload],
     addItem: (state, action) => {
       console.log(action);
-      if (state.length < 6) {
-        return validateInventory(state, action.payload);
-      }
+      return reduxValidateInventory(state, action.payload);
     },
     removeItem: (state, action) => {
       //  need some logic to remove questions

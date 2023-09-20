@@ -491,16 +491,3 @@ export const getAllItemInfo = async () => {
       );
     });
 };
-
-export const extractItemStatFromDict = (statDict) => {
-  const extractedStatDict = {};
-
-  for (const [stat, statValueDict] of Object.entries(statDict)) {
-    for (const [progressionType, value] of Object.entries(statValueDict)) {
-      if (value > 0) {
-        extractedStatDict[stat] = `${value} ${progressionType} `;
-      }
-    }
-  }
-  return extractedStatDict;
-};

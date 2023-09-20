@@ -12,6 +12,8 @@ import { objectMapArray } from "../../helper/misc";
 import { growthStatisticCalculation } from "../../helper/lol";
 import { round } from "lodash";
 import { existsSync, readFileSync } from "fs";
+import { useDispatch, useSelector } from "react-redux";
+import { setStats } from "../../store/statsSlice";
 
 export default function ChampionPage(props) {
   const setHidden = () => {
@@ -41,10 +43,14 @@ export default function ChampionPage(props) {
   ); // formatAbilities(props.championData.abilities);
   //  states
   const [stats, setStat] = useState(baseStats);
+
   const [currentLevel, setLevel] = useState(1);
   const [currentAbilities, setAbility] = useState(fa);
   const [pointAllocation, setPointAllocation] = useState(basePA);
   const [overflowScroll, setOverflowScroll] = useState(true);
+
+  const dispatch = useDispatch();
+  dispatch(setStats({ ...baseStats }));
   /*
   const [inventory, setInventory] = useState([
     {
@@ -177,7 +183,104 @@ export default function ChampionPage(props) {
       crit: round(stats.crit, 2)
     });
     setLevel(newLevel);
+    /*
+    setStat({
+      ...stats,
+      health: round(
+        stats.health +
+          growthStatisticCalculation(
+            perLevelStats.healthPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+
+      mana: round(
+        stats.mana +
+          growthStatisticCalculation(
+            perLevelStats.manaPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      armor: round(
+        stats.armor +
+          growthStatisticCalculation(
+            perLevelStats.armorPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      magicResistance: round(
+        stats.magicResistance +
+          growthStatisticCalculation(
+            perLevelStats.magicResistancePerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      healthRegen: round(
+        stats.healthRegen +
+          growthStatisticCalculation(
+            perLevelStats.healthRegenPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      manaRegen: round(
+        stats.manaRegen +
+          growthStatisticCalculation(
+            perLevelStats.manaRegenPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      attackDamage: round(
+        stats.attackDamage +
+          growthStatisticCalculation(
+            perLevelStats.attackDamagePerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      attackSpeed: round(
+        stats.attackSpeed +
+          growthStatisticCalculation(
+            perLevelStats.attackSpeedPerLevel,
+            newLevel
+          ),
+        2
+      ),
+      moveSpeed: round(
+        stats.moveSpeed +
+          growthStatisticCalculation(
+            perLevelStats.moveSpeedPerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      attackRange: round(
+        stats.attackRange +
+          growthStatisticCalculation(
+            perLevelStats.attackRangePerLevel,
+            currentLevel,
+            newLevel
+          ),
+        2
+      ),
+      crit: round(stats.crit, 2)
+    });
+    setLevel(newLevel);
     //  console.log(stats);
+    */
   }
 
   function handleSkillAllocation(key, numPoints) {

@@ -1,14 +1,6 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ReactReduxContext } from "react-redux";
-//
-import {
-  getAllItemInfo,
-  extractItemStatFromDict
-} from "../helper/lolstaticdata";
-import { generateInventoryComponentInfo } from "../helper/lolItem";
-//
-import { objectMapArray } from "../helper/misc";
 import useSWRImmutable from "swr/immutable";
 import { useDispatch, useSelector } from "react-redux";
 //
@@ -17,7 +9,18 @@ import {
   removeItem,
   inventorySelector
 } from "../store/inventorySlice";
+import { addStats } from "../store/statsSlice";
 //
+import { getAllItemInfo } from "../helper/lolstaticdata";
+import {
+  generateInventoryComponentInfo,
+  extractItemStatFromDict
+} from "../helper/lolItem";
+import { objectMapArray } from "../helper/misc";
+import { validateInventory } from "../helper/lolItem";
+
+//
+
 //Write a fetcher function to wrap the native fetch function and return the result of a call to url in json format
 const fetcher = (url) =>
   fetch(url)
@@ -82,7 +85,11 @@ export default function Shop({
     console.log(parsedItemData);
     const item = parsedItemData[itemId];
     console.log("item, ", item);
-    dispatch(addItem(parsedItemData[itemId]));
+    if (validateInventory) {
+      dispatch(addItem(parsedItemData[itemId]));
+      dispatch(addStats(parsedItemData[itemId]));
+    }
+
     /* setInventory(generateInventoryComponentInfo()); */
   };
 
