@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { extractItemStatFromDictAsTuple } from "../helper/lolItem";
-import { update } from "lodash";
+import { update, round } from "lodash";
+import { growthStatisticCalculation } from "../helper/lol";
+
 const initialState = {
   health: 0,
   mana: 0,
@@ -23,7 +25,6 @@ const statsSlice = createSlice({
   initialState,
   reducers: {
     setStats: (_, action) => {
-      console.log("STATS: ", action.payload);
       return { ...action.payload, /* items: [] ,*/ level: 1 };
     },
 
@@ -63,10 +64,112 @@ const statsSlice = createSlice({
       });
       //
       return updatedStats;
+    },
+    updateLevel: (state, action) => {
+      const newLevel = action.payload.newLevel;
+      const perLevelStats = action.payload.perLevelStats;
+      const currentLevel = state.level;
+      const updatedStats = {
+        ...state,
+        level: newLevel,
+        health: round(
+          state.health +
+            growthStatisticCalculation(
+              perLevelStats.healthPerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+
+        mana: round(
+          state.mana +
+            growthStatisticCalculation(
+              perLevelStats.manaPerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+        armor: round(
+          state.armor +
+            growthStatisticCalculation(
+              perLevelStats.armorPerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+        magicResistance: round(
+          state.magicResistance +
+            growthStatisticCalculation(
+              perLevelStats.magicResistancePerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+        healthRegen: round(
+          state.healthRegen +
+            growthStatisticCalculation(
+              perLevelStats.healthRegenPerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+        manaRegen: round(
+          state.manaRegen +
+            growthStatisticCalculation(
+              perLevelStats.manaRegenPerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+        attackDamage: round(
+          state.attackDamage +
+            growthStatisticCalculation(
+              perLevelStats.attackDamagePerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+        attackSpeed: round(
+          state.attackSpeed +
+            growthStatisticCalculation(
+              perLevelStats.attackSpeedPerLevel,
+              newLevel
+            ),
+          2
+        ),
+        moveSpeed: round(
+          state.moveSpeed +
+            growthStatisticCalculation(
+              perLevelStats.moveSpeedPerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+        attackRange: round(
+          state.attackRange +
+            growthStatisticCalculation(
+              perLevelStats.attackRangePerLevel,
+              currentLevel,
+              newLevel
+            ),
+          2
+        ),
+        crit: round(state.crit, 2)
+      };
+      return updatedStats;
     }
   }
 });
 
-export const { setStats, addStats, removeStats } = statsSlice.actions;
+export const { setStats, addStats, removeStats, updateLevel } =
+  statsSlice.actions;
 export const statsSelector = (state) => state.stats;
 export default statsSlice.reducer;

@@ -13,9 +13,12 @@ import { growthStatisticCalculation } from "../../helper/lol";
 import { round } from "lodash";
 import { existsSync, readFileSync } from "fs";
 import { useDispatch, useSelector } from "react-redux";
-import { setStats } from "../../store/statsSlice";
+import { setStats, updateLevel, statsSelector } from "../../store/statsSlice";
 
 export default function ChampionPage(props) {
+  //  enable using the stats selector
+  const currentStats = useSelector(statsSelector);
+  //  toggle the shop overlay on or off
   const setHidden = () => {
     console.log(document.body.style.overflow);
     if (document.body.style.overflow !== "hidden") {
@@ -24,7 +27,6 @@ export default function ChampionPage(props) {
       document.body.style.overflow = "scroll";
     }
   };
-
   //  starting states
   const basePA = {
     Q: 1,
@@ -32,8 +34,16 @@ export default function ChampionPage(props) {
     E: 1,
     R: 1
   };
+  //  prepare the base level data by renaming the received baseStats to baseStatsTemp etc.
+  const { baseStats: baseStatsTemp, perLevelStats: perLevelStatsTemp } =
+    parseStats(props.championData.stats);
+
+  console.log("PLS", perLevelStatsTemp);
+
   //  prepare the base level data
-  const { baseStats, perLevelStats } = parseStats(props.championData.stats);
+  const [baseStats, setBaseStats] = useState(baseStatsTemp);
+  const [perLevelStats, setPerLevelStats] = useState(perLevelStatsTemp);
+
   const fa = parse(
     props.championData.name,
     props.championData.abilities,
@@ -42,246 +52,17 @@ export default function ChampionPage(props) {
     baseStats
   ); // formatAbilities(props.championData.abilities);
   //  states
-  const [stats, setStat] = useState(baseStats);
+  //  const [stats, setStat] = useState(baseStats);
 
-  const [currentLevel, setLevel] = useState(1);
+  //  const [currentLevel, setLevel] = useState(1);
   const [currentAbilities, setAbility] = useState(fa);
   const [pointAllocation, setPointAllocation] = useState(basePA);
   const [overflowScroll, setOverflowScroll] = useState(true);
 
   const dispatch = useDispatch();
-  dispatch(setStats({ ...baseStats }));
-  /*
-  const [inventory, setInventory] = useState([
-    {
-      id: -1,
-      name: "blank",
-      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
-    },
-    {
-      id: -1,
-      name: "blank",
-      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
-    },
-    {
-      id: -1,
-      name: "blank",
-      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
-    },
-    {
-      id: -1,
-      name: "blank",
-      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
-    },
-    {
-      id: -1,
-      name: "blank",
-      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
-    },
-    {
-      id: -1,
-      name: "blank",
-      link: `http://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/Aatrox.png`
-    }
-  ]);
-  */
-  //  handle updating stats
-  function handleLevelUpdateStats(newLevel) {
-    newLevel = parseInt(newLevel);
-    setStat({
-      ...stats,
-      health: round(
-        stats.health +
-          growthStatisticCalculation(
-            perLevelStats.healthPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-
-      mana: round(
-        stats.mana +
-          growthStatisticCalculation(
-            perLevelStats.manaPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      armor: round(
-        stats.armor +
-          growthStatisticCalculation(
-            perLevelStats.armorPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      magicResistance: round(
-        stats.magicResistance +
-          growthStatisticCalculation(
-            perLevelStats.magicResistancePerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      healthRegen: round(
-        stats.healthRegen +
-          growthStatisticCalculation(
-            perLevelStats.healthRegenPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      manaRegen: round(
-        stats.manaRegen +
-          growthStatisticCalculation(
-            perLevelStats.manaRegenPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      attackDamage: round(
-        stats.attackDamage +
-          growthStatisticCalculation(
-            perLevelStats.attackDamagePerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      attackSpeed: round(
-        stats.attackSpeed +
-          growthStatisticCalculation(
-            perLevelStats.attackSpeedPerLevel,
-            newLevel
-          ),
-        2
-      ),
-      moveSpeed: round(
-        stats.moveSpeed +
-          growthStatisticCalculation(
-            perLevelStats.moveSpeedPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      attackRange: round(
-        stats.attackRange +
-          growthStatisticCalculation(
-            perLevelStats.attackRangePerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      crit: round(stats.crit, 2)
-    });
-    setLevel(newLevel);
-    /*
-    setStat({
-      ...stats,
-      health: round(
-        stats.health +
-          growthStatisticCalculation(
-            perLevelStats.healthPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-
-      mana: round(
-        stats.mana +
-          growthStatisticCalculation(
-            perLevelStats.manaPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      armor: round(
-        stats.armor +
-          growthStatisticCalculation(
-            perLevelStats.armorPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      magicResistance: round(
-        stats.magicResistance +
-          growthStatisticCalculation(
-            perLevelStats.magicResistancePerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      healthRegen: round(
-        stats.healthRegen +
-          growthStatisticCalculation(
-            perLevelStats.healthRegenPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      manaRegen: round(
-        stats.manaRegen +
-          growthStatisticCalculation(
-            perLevelStats.manaRegenPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      attackDamage: round(
-        stats.attackDamage +
-          growthStatisticCalculation(
-            perLevelStats.attackDamagePerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      attackSpeed: round(
-        stats.attackSpeed +
-          growthStatisticCalculation(
-            perLevelStats.attackSpeedPerLevel,
-            newLevel
-          ),
-        2
-      ),
-      moveSpeed: round(
-        stats.moveSpeed +
-          growthStatisticCalculation(
-            perLevelStats.moveSpeedPerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      attackRange: round(
-        stats.attackRange +
-          growthStatisticCalculation(
-            perLevelStats.attackRangePerLevel,
-            currentLevel,
-            newLevel
-          ),
-        2
-      ),
-      crit: round(stats.crit, 2)
-    });
-    setLevel(newLevel);
-    //  console.log(stats);
-    */
-  }
+  useEffect(() => {
+    dispatch(setStats({ ...baseStats }));
+  }, []);
 
   function handleSkillAllocation(key, numPoints) {
     //  console.log(numPoints - 1);
@@ -291,6 +72,11 @@ export default function ChampionPage(props) {
     });
   }
 
+  function handleLevelUpdateStats(newLevel) {
+    newLevel = parseInt(newLevel);
+    dispatch(updateLevel({ newLevel, baseStats, perLevelStats }));
+  }
+
   //  update the abilities text when pointAllocation is updated
   useEffect(() => {
     setAbility(
@@ -298,11 +84,11 @@ export default function ChampionPage(props) {
         props.championData.name,
         props.championData.abilities,
         pointAllocation,
-        stats,
+        currentStats,
         baseStats
       )
     );
-  }, [pointAllocation, stats]);
+  }, [pointAllocation, currentStats]);
 
   //  render portion
   return (
@@ -353,8 +139,10 @@ export default function ChampionPage(props) {
             </div>
             {/*Stat Window*/}
             <div className="grid grid-cols-4 ">
-              {objectMapArray(stats, (key, value) => {
-                return <div key={`${key}_${value}`}>{`${key} ${value}`}</div>;
+              {objectMapArray(currentStats, (key, value) => {
+                if (key !== "level") {
+                  return <div key={`${key}_${value}`}>{`${key} ${value}`}</div>;
+                }
               })}
             </div>
           </div>

@@ -101,7 +101,7 @@ export default function Shop({
   //
   const getItemInfo = (id, param) => {
     const item = parsedItemData[id.toString()];
-    console.log(item);
+    //  console.log(item);
     return item[param];
   };
   /*
