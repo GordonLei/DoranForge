@@ -6,15 +6,16 @@ import { useDispatch, useSelector } from "react-redux";
 //
 import {
   addItem,
-  removeItem,
+  removeItemById,
   inventorySelector
 } from "../store/inventorySlice";
-import { addStats } from "../store/statsSlice";
+import { addStats, removeStats } from "../store/statsSlice";
 //
 import { getAllItemInfo } from "../helper/lolstaticdata";
 import {
   generateInventoryComponentInfo,
-  extractItemStatFromDict
+  extractItemStatFromDict,
+  checkInInventory
 } from "../helper/lolItem";
 import { objectMapArray } from "../helper/misc";
 import { validateInventory } from "../helper/lolItem";
@@ -53,6 +54,7 @@ export default function Shop({
     return dataDict;
   };
   const dispatch = useDispatch();
+  const currentInventory = useSelector(inventorySelector);
 
   const [currItem, setCurrItem] = useState(-1);
   const [parsedItemData, setParsedItemData] = useState({});
@@ -85,9 +87,9 @@ export default function Shop({
     console.log(parsedItemData);
     const item = parsedItemData[itemId];
     console.log("item, ", item);
-    if (validateInventory) {
-      dispatch(addItem(parsedItemData[itemId]));
-      dispatch(addStats(parsedItemData[itemId]));
+    if (validateInventory(currentInventory, item)) {
+      dispatch(addItem(item));
+      dispatch(addStats(item));
     }
 
     /* setInventory(generateInventoryComponentInfo()); */
@@ -95,7 +97,14 @@ export default function Shop({
 
   const handleSell = (event, itemId) => {
     event.stopPropagation();
-    dispatch(removeItem(itemId));
+    console.log(itemId);
+    console.log(parsedItemData);
+    const item = parsedItemData[itemId];
+    console.log("item, ", item);
+    if (checkInInventory(currentInventory, item)) {
+      dispatch(removeItemById(itemId));
+      dispatch(removeStats(item));
+    }
   };
 
   //

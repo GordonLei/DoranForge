@@ -12,7 +12,7 @@ const inventorySlice = createSlice({
       console.log(action);
       return reduxValidateInventory(state, action.payload);
     },
-    removeItem: (state, action) => {
+    removeItemById: (state, action) => {
       //  need some logic to remove questions
       const id = action.payload;
       let found = false;
@@ -27,6 +27,6 @@ const inventorySlice = createSlice({
   }
 });
 
-export const { setInventory, addItem, removeItem } = inventorySlice.actions;
+export const { setInventory, addItem, removeItemById } = inventorySlice.actions;
 export const inventorySelector = (state) => state.inventory;
 export default inventorySlice.reducer;

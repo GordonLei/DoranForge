@@ -27,6 +27,17 @@ export const extractItemStatFromDictAsTuple = (statDict) => {
   return extractedStatDict;
 };
 
+export const checkInInventory = (currentInventory, item) => {
+  const itemID = item.id;
+  console.log("ITEMID:", item, itemID);
+  for (let i = 0; i < currentInventory.length; i++) {
+    if (currentInventory[i].id === itemID) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const validateInventory = (currentInventory, newItem) => {
   if (currentInventory.length >= 6) {
     return false;

@@ -16,6 +16,7 @@ const initialState = {
   attackRange: 0,
   abilityPower: 0,
   crit: 0,
+  abilityHaste: 0,
   level: 0
   //  items: [] //  want this to make sure the items are there?
 };
@@ -25,7 +26,7 @@ const statsSlice = createSlice({
   initialState,
   reducers: {
     setStats: (_, action) => {
-      return { ...action.payload, /* items: [] ,*/ level: 1 };
+      return { ...action.payload, /* items: [] ,*/ level: 1, abilityHaste: 0 };
     },
 
     addStats: (state, action) => {
