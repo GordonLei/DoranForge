@@ -1,8 +1,8 @@
-import axios from "axios";
 /*
 Helper code for DataDragon JSON files
 */
 
+import axios from "axios";
 const ddragonBaseURL = `http://ddragon.leagueoflegends.com/cdn/`;
 
 /*
@@ -73,6 +73,10 @@ export const getChampionInfo = async (patchVersion, name) => {
       );
     });
 };
+
+/*
+seperate the baseStats and perLevelStats from a champion data
+*/
 export const parseStats = (stats) => {
   const baseStats = {
     hp: stats.hp,
@@ -85,7 +89,7 @@ export const parseStats = (stats) => {
     attackSpeed: stats.attackspeed,
     moveSpeed: stats.movespeed,
     attackRange: stats.attackrange,
-    crit: stats.crit,
+    crit: stats.crit
   };
   const perLevelStats = {
     hpPerLevel: stats.hpperlevel,
@@ -96,11 +100,14 @@ export const parseStats = (stats) => {
     mpRegenPerLevel: stats.mpregenperlevel,
     critPerLevel: stats.critperlevel,
     attackDamagePerLevel: stats.attackdamageperlevel,
-    attackSpeedPerLevel: stats.attackspeedperlevel,
+    attackSpeedPerLevel: stats.attackspeedperlevel
   };
   return { baseStats, perLevelStats };
 };
 
+/*
+format the data to map skills to buttons and then add the passive information
+*/
 export const formatSkillsAndPassive = (championInfo) => {
   let unparsedSkills = {};
   const skillNames = ["Q", "W", "E", "R"];

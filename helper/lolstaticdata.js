@@ -1,18 +1,21 @@
 /*
 Helper file for Meraki-Analytics' LoL Static Data
 */
+//  libraries
 import axios from "axios";
+import { round } from "lodash";
+//  helper functions
 import {
   objectMap,
   caseInsensitiveReplace,
   findWord,
   checkSubset
 } from "./misc";
-import { round } from "lodash";
+
 //
 
 /*
-get the related champion data from the JSON
+get the related champion data from the JSON contained in merakianalytics
 */
 export const getChampionInfo = async (patchVersion, name) => {
   const lolStaticDataURL = `http://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/champions/${name}.json`;
@@ -41,6 +44,7 @@ export const getChampionInfo = async (patchVersion, name) => {
       );
     });
 };
+/* seperate base stats and perLevel stats from the champion json */
 export const parseStats = (stats) => {
   const baseStats = {
     health: stats.health.flat,
@@ -74,6 +78,8 @@ export const parseStats = (stats) => {
   return { baseStats, perLevelStats };
 };
 
+//  create an object where for each key / ability,
+//    all the ability  descriptions are combined into one message
 export const combineAbilityDescriptions = (abilitiesObject) => {
   const combinedAbilityDescriptionsObject = objectMap(
     abilitiesObject,
@@ -96,6 +102,7 @@ export const combineAbilityDescriptions = (abilitiesObject) => {
   return combinedAbilityDescriptionsObject;
 };
 
+//  combine the names of abilities if applicable (if the name contains multiple words)
 export const combineNames = (abilitiesObject) => {
   const combinedNamesObject = objectMap(abilitiesObject, (key, value) => {
     //  now map through the array that is the value of the key
@@ -109,13 +116,19 @@ export const combineNames = (abilitiesObject) => {
   return combinedNamesObject;
 };
 
+//  Master function to create an object where abilities + passives are mapped  to letters / buttons
 export const formatAbilities = (abilitiesObject) => {
+  //  final formatted object
   let formatted = { P: {}, Q: {}, W: {}, E: {}, R: {} };
   const abilityID = ["P", "Q", "W", "E", "R"];
   //  add the descriptions
   const combinedDescriptions = combineAbilityDescriptions(abilitiesObject);
   const combinedNames = combineNames(abilitiesObject);
-  //  do everything
+  //  do everything for formatting
+  //  basically  for each letter, make the value within FORMATTED...
+  //    contain the full name
+  //    contain the full ability  description
+  //    contain the full ability tooltip (iirc this is the most descriptive form)
   abilityID.forEach((ability) => {
     formatted[ability] = {
       ...formatAbilities[ability],
@@ -124,11 +137,10 @@ export const formatAbilities = (abilitiesObject) => {
       tooltip: combinedDescriptions[ability]
     };
   });
-  //  console.log(formatted);
-  //  console.log(prepStylize(abilitiesObject));
   return formatted;
 };
 
+//  add the number values into the text. basically  calculate the  numbers
 const numerize = (
   text,
   currentStats = {
@@ -168,12 +180,15 @@ const numerize = (
     (accumulator, currentValue) => {
       //  if isNaN returns true, then the variable is NOT a valid number
       //  console.log(currentValue);
-
+      //  if the current thing is not a number, return the current count
       if (!isNaN(currentValue)) {
         return accumulator + parseInt(currentValue);
       } else {
+        //  split the value to seperate number and stat value
         const baseArray = currentValue.split(" ");
         //  console.log("BA", baseArray);
+
+        //  if you are AP AND AD, calculate the mix-dmg ratio
         if (checkSubset(baseArray, ["ap", "ad"])) {
           return (
             accumulator +
@@ -213,11 +228,12 @@ const numerize = (
   if (!numerizedText) {
     return oldText;
   }
+  //  return the calculated value with the calculation equation next to it
   return `${round(numerizedText, 2)} (or ${oldText})`;
 };
 
 const modifyAttribute = (championName, attribute) => {
-  //  check for special cases
+  //  check for special cases where the Stylize functions will not catch
   if (
     (attribute.includes("cast damage") ||
       attribute.includes("sweetspot damage") ||
@@ -229,6 +245,7 @@ const modifyAttribute = (championName, attribute) => {
   return attribute;
 };
 
+//  do steps before stlyzing text, such as formatting text
 const prepStylize = (
   championName,
   abilitiesObject,
@@ -249,31 +266,54 @@ const prepStylize = (
     P: []
   };
   const prepped = objectMap(abilitiesObject, (key, value) => {
+    //  for each ability, get  the tooltip and map...
+
+    /*
+
+    Note the structure of a Champion JSON looks like this 
+    { ...,
+      abilities: {
+        "P": [
+          {name:..., icon:..., 
+                effects: [
+                  {
+                    description: ""
+                    leveling: []
+                  }
+                ]
+            , }
+        ]
+      }
+      
+    }
+    */
+
     const tooltip = value
       .map((eachAbilityComponent) => {
+        //  get the Skill Button based on the image
         const skillButtonName = eachAbilityComponent.icon
           .split("/")
           .slice(-1)[0]
           .toUpperCase();
+        //  find how many points have been allocated
         const allocatedPoints = pointAllocation[skillButtonName];
+        //  update the SkillName object  that represents the Champion's abilities
         skillNames[skillButtonName].push(eachAbilityComponent.name);
         //  recall eachAbilityComponent has an effects array that contains descriptions
         return eachAbilityComponent.effects.map((eachEffectComponent) => {
           //  recall eachEffectComponent like {description: ..., leveling:[...], ... }
           // THIS IS WHERE WE MODIFY THE DESCRIPTIONS
           let modifiedDescription = eachEffectComponent.description;
-          //  map through the leveling
+          //  map through the leveling which represents the numerical values that change when you skill up
           eachEffectComponent.leveling.map((eachLevelComponent) => {
             //  map through the modifiers based on point allocation
-
             const attribute = modifyAttribute(
               championName,
               eachLevelComponent.attribute.toLowerCase()
             );
-
-            //  const attribute = eachLevelComponent.attribute.toLowerCase();
-            //  console.log(attribute);
-
+            //  for each of the numerical value that changes in a skill, create an array of strings
+            //    that combines the values and units
+            //  this represents an array with all the numerical changes to a skill at a specific point allocation
             const modifiers = eachLevelComponent.modifiers.map(
               (modifierObject) => {
                 //  console.log(modifierObject);
@@ -284,16 +324,17 @@ const prepStylize = (
             );
             //  console.log(modifiers);
             //  replace the attribute with the modifiers
-
+            //  join each modifier
             const joinedModifiers = modifiers.join(" + ");
+            //  now replace the equations with numbers in the modifier
             const numerizedModifiers = numerize(
               joinedModifiers,
               currentStats,
               baseStats
             );
-
+            //  create a string representation of the modifier that is to be parsed
             const replacement = `<${attribute}> ${numerizedModifiers} </${attribute}>`;
-            //  console.log(replacement);
+            //  replace any of the modifiers in the description with the replacement
             modifiedDescription = caseInsensitiveReplace(
               modifiedDescription,
               attribute,
@@ -306,7 +347,7 @@ const prepStylize = (
               "sweetspot",
               "healing"
             ];
-            //  console.log(attribute);
+            //  for now, if the decription has some of these keywords and they are not replaced, add it to the end of the description
             for (let i = 0; i < keyword.length; i++) {
               if (attribute.includes(keyword[i])) {
                 modifiedDescription += `<seperate> ${replacement} </seperate> `;
@@ -331,8 +372,11 @@ const prepStylize = (
   return prepped;
 };
 
+//  this will parse through a description and replace the equations with numbers
 const lolTextParser = (text, skillButtonName) => {
+  //  this will represent a sentence
   const sentence = [];
+  //  look for flags that look like <attribute> ... </attribute>
   while (text.indexOf("<") !== -1) {
     let startIndex = text.indexOf("<");
     let endIndex = text.indexOf(">");
@@ -343,7 +387,7 @@ const lolTextParser = (text, skillButtonName) => {
       format: "normal",
       text: text.substring(0, startIndex)
     });
-
+    //  check for a flag of newline ???
     if (keyword === "seperate") {
       sentence.push({
         format: "seperate",
@@ -355,7 +399,7 @@ const lolTextParser = (text, skillButtonName) => {
       keyword = text.substring(startIndex + 1, endIndex);
       seperateFlag = true;
     }
-
+    //  find the end of the keyword
     const closer = text.indexOf(`</${keyword}>`);
     //  push the thing within the text
     sentence.push({
@@ -369,7 +413,7 @@ const lolTextParser = (text, skillButtonName) => {
   sentence.push({ format: "normal", text });
   //  console.log("SENTENCE:", sentence);
   //now create the divs
-
+  //  colorize words with specific meanings
   return sentence.map(({ format, text }, index) => {
     const potentialClass = format.includes("seperate") ? " seperateStat " : "";
     switch (format) {
@@ -428,7 +472,7 @@ const lolTextParser = (text, skillButtonName) => {
     }
   });
 };
-
+//  master "stylize" function that replaces equations and add colors
 const stylize = (abilitiesObject) => {
   const skillButonNames = ["P", "Q", "W", "E", "R"];
   skillButonNames.forEach((name) => {
@@ -442,6 +486,7 @@ const stylize = (abilitiesObject) => {
   return abilitiesObject;
 };
 
+//  Master function that parses champion ability formation with the stats and return desired information
 export const parse = (
   championName,
   abilitiesObject,
@@ -450,6 +495,7 @@ export const parse = (
   baseStats
 ) => {
   let parsedAO;
+  //  prepare for anything prior to stylize
   parsedAO = prepStylize(
     championName,
     abilitiesObject,
@@ -458,6 +504,7 @@ export const parse = (
     baseStats
   );
   //  parsedAO = convertToStats(parsedAO, stats);
+  //  now add the specific stylizations
   parsedAO = stylize(parsedAO);
   //  console.log(parsedAO);
   return parsedAO;
