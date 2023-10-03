@@ -114,7 +114,7 @@ export default function Shop({
       dispatch(removeStats(item));
     }
   };
-  //  from the item dict, get the item information based on a key/property of the item
+  //  from the item dict, get the item information based on a key/property of the item + item id
   const getItemInfo = (id, param) => {
     const item = parsedItemData[id.toString()];
     //  console.log(item);
@@ -140,6 +140,27 @@ export default function Shop({
           <div className="sticky h-screen  top-16 overflow-y-scroll overscroll-contain col-span-5 grid grid-cols-5 gap-2">
             {parsedItemData &&
               Object.values(parsedItemData).map((item) => {
+                if (item.requiredAlly === "Ornn") {
+                  return (
+                    <div className="relative">
+                      {/* NOTE:  need to change this link*/}
+                      <img
+                        src={`https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png`}
+                        alt={`${item.name} ornn border`}
+                        key={`${item.id} ornn border`}
+                        onClick={(e) => handleClick(item.id)}
+                        className="z-50 absolute"
+                      />
+                      <img
+                        src={item.icon}
+                        alt={`${item.name} png`}
+                        key={`${item.id}`}
+                        onClick={(e) => handleClick(item.id)}
+                        className="z-40"
+                      />
+                    </div>
+                  );
+                }
                 return (
                   <img
                     src={item.icon}
@@ -153,12 +174,22 @@ export default function Shop({
           {/* Right side panel that shows selected item description */}
           <div className="sticky w-full col-span-4 pr-32">
             {/* If an item is selected, then display it*/}
+            {console.log(`CHECK THIS: ${currItem}`)}
             {currItem < 0 || (
-              <div>
+              <div className="relative">
+                {getItemInfo(currItem, "requiredAlly") !== "Ornn" || (
+                  <img
+                    src={`https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png`}
+                    alt={`${getItemInfo(currItem, "name")} ornn border`}
+                    key={`${currItem} ornn border`}
+                    className="z-50 absolute"
+                  />
+                )}
                 <img
                   src={getItemInfo(currItem, "icon")}
                   alt={`${getItemInfo(currItem, "name")} png`}
                   key={`item_${currItem}`}
+                  className="z-40"
                 />
                 <div>{getItemInfo(currItem, "name")}</div>
                 <div>{getItemInfo(currItem, "simpleDescription")}</div>
