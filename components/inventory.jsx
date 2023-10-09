@@ -59,7 +59,25 @@ export default function Inventory({
         {/* Inventory Section */}
         {currentInventory.map((item, index) => {
           /* Map all of the item icons */
-          if (item.icon) {
+          if (item.requiredAlly === "Ornn") {
+            return (
+              <div className="relative">
+                {/* NOTE:  need to change this link*/}
+                <img
+                  src={`https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png`}
+                  alt={`${item.name} ornn border`}
+                  key={`${item.id} ornn border`}
+                  className="z-50 absolute"
+                />
+                <img
+                  src={item.icon}
+                  alt={`${item.name} png`}
+                  key={`${item.id}`}
+                  className="z-40"
+                />
+              </div>
+            );
+          } else if (item.icon) {
             return (
               <img
                 src={item.icon}
