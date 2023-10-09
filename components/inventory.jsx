@@ -55,7 +55,7 @@ export default function Inventory({
         </div>
       </div>
 
-      <div className="sticky top-n6  h-20  content-center">
+      <div className="sticky top-16  h-20  content-center">
         {/* Inventory Section */}
         {currentInventory.map((item, index) => {
           /* Map all of the item icons */

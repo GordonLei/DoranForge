@@ -5,5 +5,4 @@ TO DOS:
 - Buying mana items should not increase the mana for Energy / Fury champions
   - Would be nice to have these champs have "energy / fury" shown up as text instead of "mana"
 - Properly make only 1 mythic per inventory and other niche / unique instances
-- Add Ornn item border
 - Make everything look better
