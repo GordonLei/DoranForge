@@ -13,7 +13,7 @@ import { getAllItemInfo } from "../helper/lolstaticdata";
 import {
   generateInventoryComponentInfo,
   extractItemStatFromDict,
-  checkInInventory
+  checkInInventory,
 } from "../helper/lolItem";
 import { objectMapArray } from "../helper/misc";
 import { validateInventory } from "../helper/lolItem";
@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addItem,
   removeItemById,
-  inventorySelector
+  inventorySelector,
 } from "../store/inventorySlice";
 import { addStats, removeStats } from "../store/statsSlice";
 
@@ -46,7 +46,7 @@ export default function Shop({
   /* setInventory, */
   getItemDataMethod,
   setStat,
-  currentItems
+  currentItems,
 }) {
   /*
   Vars
@@ -81,7 +81,7 @@ export default function Shop({
       console.log("DONE");
       setParsedItemData(parsedData);
       console.log(parsedData);
-    }
+    },
   });
   //  handle pressing the item and setting the current selected item to that
   const handleClick = (itemId) => {
@@ -142,7 +142,7 @@ export default function Shop({
               Object.values(parsedItemData).map((item) => {
                 if (item.requiredAlly === "Ornn") {
                   return (
-                    <div className="relative">
+                    <div className="relative" key={`${item.id} item`}>
                       {/* NOTE:  need to change this link*/}
                       <img
                         src={`https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png`}

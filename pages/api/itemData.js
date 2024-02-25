@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   //Find the absolute path of the data directory
   const jsonDirectory = path.join(
     process.cwd(),
-    `json/${process.env.leaguePatch}`
+    `data/lolstaticdata/${process.env.leaguePatch}`
     //  `data/lolstaticdata/12.23.1/`
     //`data/lolstaticdata/${req.body.patchVersion}`
   );
