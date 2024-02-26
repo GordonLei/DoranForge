@@ -1,3 +1,4 @@
+"use client";
 /*
 This component is the 
 */
@@ -5,17 +6,19 @@ This component is the
 //  libraries
 import Image from "next/image";
 import Shop from "./shop";
-import { current } from "@reduxjs/toolkit";
+
 import { useState, useRef } from "react";
 //  react-redux
 import { useDispatch, useSelector } from "react-redux";
-import { addItem, inventorySelector } from "../store/inventorySlice";
+import {
+  addItem,
+  inventorySelector,
+} from "@/lib/storeFeatures/inventory/inventorySlice";
 
 //  Inventory component
 export default function Inventory({
   /* inventory, */
   setOverflowScroll,
-  setHidden
   /* setInventory */
 }) {
   /*
@@ -40,6 +43,16 @@ export default function Inventory({
     setShopVisibility(!showShop);
     setOverflowScroll(false);
     setHidden();
+  };
+
+  //  toggle the shop overlay on or off
+  const setHidden = () => {
+    console.log(document.body.style.overflow);
+    if (document.body.style.overflow !== "hidden") {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "scroll";
+    }
   };
 
   /*

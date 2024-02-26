@@ -1,3 +1,5 @@
+"use client";
+
 /*
 
 This component is that shop pop up where users can purchase and sell items
@@ -24,8 +26,8 @@ import {
   addItem,
   removeItemById,
   inventorySelector,
-} from "../store/inventorySlice";
-import { addStats, removeStats } from "../store/statsSlice";
+} from "@/lib/storeFeatures/inventory/inventorySlice";
+import { addStats, removeStats } from "@/lib/storeFeatures/stats/statsSlice";
 
 //Write a fetcher function to wrap the native fetch function and return the result of a call to url in json format
 const fetcher = (url) =>

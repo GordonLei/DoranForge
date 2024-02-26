@@ -6,7 +6,7 @@ import Link from "next/link";
 export const dynamic = "force-static";
 
 //  migrated getStaticProps to app router (changed name to getStaticData)
-export const getStaticData = async () => {
+const getStaticData = async () => {
   const championIDArray = await getChampionIDArray(process.env.leaguePatch);
   //  get a list of champion icons
   const championIconArray = championIDArray.map((id) => {
