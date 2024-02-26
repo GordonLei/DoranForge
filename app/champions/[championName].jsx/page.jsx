@@ -1,16 +1,10 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import Layout from "../../components/layout";
 import Inventory from "../../components/inventory";
-import {
-  getChampionInfo,
-  getAllItemInfo,
-  parseStats,
-  formatAbilities,
-  parse
-} from "../../helper/lolstaticdata";
+import { getChampionInfo, parseStats, parse } from "../../helper/lolstaticdata";
 import { objectMapArray } from "../../helper/misc";
-import { growthStatisticCalculation } from "../../helper/lol";
-import { round } from "lodash";
 import { existsSync, readFileSync } from "fs";
 import { useDispatch, useSelector } from "react-redux";
 import { setStats, updateLevel, statsSelector } from "../../store/statsSlice";
@@ -32,7 +26,7 @@ export default function ChampionPage(props) {
     Q: 1,
     W: 1,
     E: 1,
-    R: 1
+    R: 1,
   };
   //  prepare the base level data by renaming the received baseStats to baseStatsTemp etc.
   const { baseStats: baseStatsTemp, perLevelStats: perLevelStatsTemp } =
@@ -68,7 +62,7 @@ export default function ChampionPage(props) {
     //  console.log(numPoints - 1);
     setPointAllocation({
       ...pointAllocation,
-      [key]: numPoints
+      [key]: numPoints,
     });
   }
 
