@@ -16,11 +16,12 @@ import {
 } from "@/lib/storeFeatures/inventory/inventorySlice";
 
 //  Inventory component
-export default function Inventory({
-  /* inventory, */
-  setOverflowScroll,
-  /* setInventory */
-}) {
+export default function Inventory(
+  {
+    /* inventory, */
+    /* setInventory */
+  }
+) {
   /*
   Vars
   */
@@ -41,7 +42,6 @@ export default function Inventory({
   const handleClick = async (event) => {
     //  show the shop
     setShopVisibility(!showShop);
-    setOverflowScroll(false);
     setHidden();
   };
 

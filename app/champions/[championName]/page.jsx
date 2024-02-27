@@ -1,27 +1,9 @@
 import Inventory from "@/components/inventory";
 import { getChampionInfo, parseStats, parse } from "@/helper/lolstaticdata";
 import { existsSync, readFileSync } from "fs";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  setStats,
-  updateLevel,
-  statsSelector,
-} from "@/lib/storeFeatures/stats/statsSlice";
-import axios from "axios";
+
 import StatsMenu from "@/components/statsMenu";
 import SkillsMenu from "@/components/skillsMenu";
-
-const isFileExists = async (link) => {
-  const res = await fetch(link, { method: "HEAD" });
-  return res.status === 200;
-};
-
-const readFile = async (link) => {
-  console.log("LINK: ", link);
-  const res = await fetch(link);
-  console.log(res);
-  return res;
-};
 
 async function getChampionData(championName) {
   //  let unparsedItemData;

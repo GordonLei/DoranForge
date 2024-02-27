@@ -9,17 +9,21 @@ This is the menu that displays the Stat information
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 //    lib folder functions
-import { updateLevel } from "@/lib/storeFeatures/stats/statsSlice";
+import {
+  setStats,
+  updateLevel,
+  statsSelector,
+} from "@/lib/storeFeatures/stats/statsSlice";
 //    helper functions
 import { objectMapArray } from "@/helper/misc";
 
 //  Stats Menu component
-const StatsMenu = ({ championData, baseStatsProp, perLevelStatsProp }) => {
+const StatsMenu = ({ championData, baseStats, perLevelStats }) => {
   //
   const currentStats = useSelector(statsSelector);
   //  prepare the base level data
-  const [baseStats, setBaseStats] = useState(baseStatsProp);
-  const [perLevelStats, setPerLevelStats] = useState(perLevelStatsProp);
+  //  const [baseStats, setBaseStats] = useState(baseStatsProp);
+  //  const [perLevelStats, setPerLevelStats] = useState(perLevelStatsProp);
   //  function to update the Store to the new level
   function handleLevelUpdateStats(newLevel) {
     newLevel = parseInt(newLevel);

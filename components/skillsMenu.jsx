@@ -7,9 +7,12 @@ This is the menu that displays the Skills information
 //  imports
 //    npm packages
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 //    helper functions
 import { objectMapArray } from "@/helper/misc";
-
+import { parse } from "@/helper/lolstaticdata";
+//    lib folder functions
+import { statsSelector } from "@/lib/storeFeatures/stats/statsSlice";
 //
 const basePA = {
   Q: 1,
@@ -21,12 +24,14 @@ const basePA = {
 //  Skills Menu component
 const SkillsMenu = ({ name, abilities, baseStats }) => {
   //
+  const fa = parse(name, abilities, basePA, baseStats, baseStats);
+  //  enable using the stats selector
+  const currentStats = useSelector(statsSelector);
 
   //
   const [currentAbilities, setAbility] = useState(fa);
   const [pointAllocation, setPointAllocation] = useState(basePA);
-  //
-  const fa = parse(name, abilities, basePA, baseStats, baseStats);
+
   //
   function handleSkillAllocation(key, numPoints) {
     //  console.log(numPoints - 1);
@@ -38,22 +43,18 @@ const SkillsMenu = ({ name, abilities, baseStats }) => {
   //  update the abilities text when pointAllocation is updated
   useEffect(() => {
     setAbility(
-      parse(
-        props.championData.name,
-        props.championData.abilities,
-        pointAllocation,
-        currentStats,
-        baseStats
-      )
+      parse(name, abilities, pointAllocation, currentStats, baseStats)
     );
   }, [pointAllocation, currentStats]);
 
   return (
     <div
       className={`${
+        /*
         overflowScroll
           ? ""
           : " overflow-y-scroll overscroll-y-none overflow-hidden"
+  */ "o"
       }`}
     >
       {objectMapArray(currentAbilities, (key, value) => {
