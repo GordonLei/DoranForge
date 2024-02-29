@@ -1,0 +1,36 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["airbnb", "prettier", "next"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+
+  "rules": {
+    "linebreak-style": "off",
+    "quotes": "off",
+    "react/prop-types": "off",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off"
+  },
+  "settings": {
+  "import/resolver": {
+    "alias": {
+      "map": [
+        ["@/*", "./"],
+        ["@/components/", "./components/"],
+         ["babel-polyfill", "babel-polyfill/dist/polyfill.min.js"],
+          ["helper", "./utils/helper"],
+          ["material-ui/DatePicker", "../custom/DatePicker"],
+          ["material-ui", "material-ui-ie10"]
+      ],
+      "extensions": [".ts", ".js", ".jsx", ".json"]
+        
+    }
+  }
+}
+  
+}

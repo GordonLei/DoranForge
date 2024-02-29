@@ -1,27 +1,20 @@
 "use client";
+
 /*
-This component is the 
+This component is the button that opens up the 
 */
 
 //  libraries
 import Image from "next/image";
-import Shop from "./shop";
 
 import { useState, useRef } from "react";
 //  react-redux
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addItem,
-  inventorySelector,
-} from "@/lib/storeFeatures/inventory/inventorySlice";
+import { useSelector } from "react-redux";
+import { inventorySelector } from "@/lib/storeFeatures/inventory/inventorySlice";
+import Shop from "./shop";
 
 //  Inventory component
-export default function Inventory(
-  {
-    /* inventory, */
-    /* setInventory */
-  }
-) {
+export default function Inventory() {
   /*
   Vars
   */
@@ -38,21 +31,21 @@ export default function Inventory(
   Functions
   */
 
-  //  handle setting the shop to be visible
-  const handleClick = async (event) => {
-    //  show the shop
-    setShopVisibility(!showShop);
-    setHidden();
-  };
-
   //  toggle the shop overlay on or off
   const setHidden = () => {
-    console.log(document.body.style.overflow);
+    //  console.log(document.body.style.overflow);
     if (document.body.style.overflow !== "hidden") {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "scroll";
     }
+  };
+
+  //  handle setting the shop to be visible
+  const handleClick = async () => {
+    //  show the shop
+    setShopVisibility(!showShop);
+    setHidden();
   };
 
   /*
@@ -64,58 +57,75 @@ export default function Inventory(
       <div className="absolute left-0 flex">
         <div className="flex">
           <Shop showShop={showShop} />
-          <div className="sticky top-16 h-20 content-center"></div>
+          <div className="sticky top-16 h-20 content-center" />
         </div>
       </div>
 
       <div className="sticky top-16  h-20  content-center">
-        {/* Inventory Section */}
-        {currentInventory.map((item, index) => {
+        {/* Inventory Section. */}
+        {/*   This displays the items in the inventory bar shown on the right */}
+        {currentInventory.map((item) => {
           /* Map all of the item icons */
           if (item.requiredAlly === "Ornn") {
             return (
-              <div className="relative">
-                {/* NOTE:  need to change this link*/}
-                <img
-                  src={`https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png`}
+              <div
+                className="relative h-[64px] w-[64px]"
+                key={`${item.id} ornn border div  `}
+              >
+                {/* NOTE:  need to change this link so it auto updates to the current patch */}
+                <Image
+                  src="https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png"
                   alt={`${item.name} ornn border`}
                   key={`${item.id} ornn border`}
-                  className="z-50 absolute"
+                  className="absolute z-50"
+                  fill
+                  sizes="64px"
                 />
-                <img
+                <Image
                   src={item.icon}
                   alt={`${item.name} png`}
                   key={`${item.id}`}
                   className="z-40"
+                  fill
+                  sizes="64px"
                 />
               </div>
             );
-          } else if (item.icon) {
+          }
+          if (item.icon) {
             return (
-              <img
-                src={item.icon}
-                alt={`${item.name} png`}
-                key={`item_${index}`}
-              />
-            );
-          } else {
-            //  Will have to change this to related code
-            return (
-              <img
-                src={item.icon}
-                alt={`${item.name} png`}
-                key={`item_${index}`}
-              />
+              <div
+                className="relative h-[64px] w-[64px]"
+                key={`${item.name} div`}
+              >
+                <Image
+                  src={item.icon}
+                  alt={`${item.name} png`}
+                  key={`${item.name} png`}
+                />
+              </div>
             );
           }
+          //  Will have to change this to do relevant thing when the ICON DOES NOT EXIST
+          return (
+            <Image
+              src={item.icon}
+              alt={`${item.name} png`}
+              key={`${item.name} png`}
+            />
+          );
         })}
         {/* Button to open the shop menu */}
-        <button idname="openShop">
+        <button
+          id="openShop"
+          type="button"
+          className="relative h-[64px] w-[64px]"
+        >
           <Image
             src="/images/temp_openInventory.png"
             alt="me"
-            width="64"
-            height="64"
+            fill
+            sizes="64px"
             onClick={handleClick}
             ref={buttonOpenShop}
           />

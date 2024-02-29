@@ -1,11 +1,10 @@
 // app/layout.tsx
-import { Providers } from "./providers";
+import Providers from "./providers";
 
 // These styles apply to every route in the application
 import "./globals.css";
 
 export default function RootLayout({ children }) {
-  console.log("RENDER THIS PLEASE");
   return (
     <html lang="en" className="dark">
       <body>

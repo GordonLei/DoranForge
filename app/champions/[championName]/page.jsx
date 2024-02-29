@@ -1,21 +1,14 @@
-import Inventory from "@/components/inventory";
-import { getChampionInfo, parseStats, parse } from "@/helper/lolstaticdata";
+import { getChampionInfo, parseStats } from "@/helper/lolstaticdata";
 import { existsSync, readFileSync } from "fs";
+import Inventory from "@/components/inventory";
 
 import StatsMenu from "@/components/statsMenu";
 import SkillsMenu from "@/components/skillsMenu";
 
 async function getChampionData(championName) {
-  //  let unparsedItemData;
   let championData;
-  const latestItemJsonURL =
-    process.cwd() + `/data/lolstaticdata/${process.env.leaguePatch}/items.json`;
   //
-  const latestChampionJsonURL =
-    process.cwd() +
-    `/data/lolstaticdata/${process.env.leaguePatch}/champions/${championName}.json`;
-  console.log("HERE");
-  console.log("JSON URL IS THIS: ", latestChampionJsonURL);
+  const latestChampionJsonURL = `${process.cwd()}/data/lolstaticdata/${process.env.leaguePatch}/champions/${championName}.json`;
   if (existsSync(latestChampionJsonURL)) {
     const data = readFileSync(latestChampionJsonURL);
     championData = JSON.parse(data);
@@ -30,7 +23,6 @@ async function getChampionData(championName) {
 const ChampionPage = async ({ params }) => {
   //
   const championData = await getChampionData(params.championName);
-  console.log("PROPS: ", championData);
   //  take all the releveant information from the championData stats
   const { baseStats, perLevelStats } = parseStats(championData.stats);
   /*

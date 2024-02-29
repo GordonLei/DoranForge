@@ -6,3 +6,5 @@ TO DOS:
   - Would be nice to have these champs have "energy / fury" shown up as text instead of "mana"
 - Properly make only 1 mythic per inventory and other niche / unique instances
 - Make everything look better
+- Inventory.jsx --> Ornn border should use current patch border
+- Inventory.jsx --> Make sure if the icon does not exist, use a temporary image

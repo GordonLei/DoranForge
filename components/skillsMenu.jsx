@@ -1,7 +1,7 @@
 "use client";
 
 /*
-This is the menu that displays the Skills information 
+This is the menu  that displays the Skills information
 */
 
 //  imports
@@ -22,7 +22,7 @@ const basePA = {
 };
 
 //  Skills Menu component
-const SkillsMenu = ({ name, abilities, baseStats }) => {
+function SkillsMenu({ name, abilities, baseStats }) {
   //
   const fa = parse(name, abilities, basePA, baseStats, baseStats);
   //  enable using the stats selector
@@ -43,58 +43,47 @@ const SkillsMenu = ({ name, abilities, baseStats }) => {
   //  update the abilities text when pointAllocation is updated
   useEffect(() => {
     setAbility(
+      //  eslint-disable-next-line comma-dangle
       parse(name, abilities, pointAllocation, currentStats, baseStats)
     );
-  }, [pointAllocation, currentStats]);
+  }, [name, abilities, baseStats, pointAllocation, currentStats]);
 
   return (
-    <div
-      className={`${
-        /*
-        overflowScroll
-          ? ""
-          : " overflow-y-scroll overscroll-y-none overflow-hidden"
-  */ "o"
-      }`}
-    >
-      {objectMapArray(currentAbilities, (key, value) => {
-        return (
-          <div key={`${key}_skill`} className="border-t-2 m-4">
-            <div key={`${key}_name`}>
-              {`${key === "P" ? "Passive" : key}: ${value.name}`}
-              {key !== "P" && (
-                <select
-                  name="level"
-                  id="level"
-                  key={`${key}_select`}
-                  onChange={(event) =>
-                    handleSkillAllocation(key, event.target.value)
-                  }
-                >
-                  {Array.from(Array(key === "R" ? 3 : 5).keys()).map(
-                    (level) => {
-                      return (
-                        <option
-                          key={`${key}_level_${level + 1}`}
-                          value={level + 1}
-                        >
-                          {level + 1}
-                        </option>
-                      );
-                    }
-                  )}
-                </select>
-              )}
-            </div>
-            <div key={`${key}_tooltip`}>
-              {value.tooltip.map((each, index) => {
-                return <div key={`${key}_tooltip_${index}`}>{each}</div>;
-              })}
-            </div>
+    <div>
+      {objectMapArray(currentAbilities, (key, value) => (
+        <div key={`${key}_skill`} className="m-4 border-t-2">
+          <div key={`${key}_name`}>
+            {`${key === "P" ? "Passive" : key}: ${value.name}`}
+            {key !== "P" && (
+              <select
+                name="level"
+                id="level"
+                key={`${key}_select`}
+                onChange={(event) =>
+                  handleSkillAllocation(key, event.target.value)
+                }
+              >
+                {Array.from(Array(key === "R" ? 3 : 5).keys()).map((level) => (
+                  <option key={`${key}_level_${level + 1}`} value={level + 1}>
+                    {level + 1}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
-        );
-      })}
+          <div key={`${key}_tooltip_parent`}>
+            {/* console.log(key, each[0].props.children[1].length, index) */}
+            {value.tooltip.map((each) => (
+              <div
+                key={`${key}_tooltip_${each[0].props.children[1].split(" ").slice(0, 5).join("-")}`}
+              >
+                {each}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
-};
+}
 export default SkillsMenu;

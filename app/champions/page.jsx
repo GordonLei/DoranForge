@@ -1,5 +1,12 @@
-import { getChampionIDArray } from "../../helper/datadragon";
+/*
+This is the root page that shows all the champions in a grid
+*/
+
+//  imports
+//    npm packages
+import Image from "next/image";
 import Link from "next/link";
+import { getChampionIDArray } from "../../helper/datadragon";
 
 //  page data is fetched once and cached, not refetched on every load
 export const dynamic = "force-static";
@@ -8,13 +15,10 @@ export const dynamic = "force-static";
 const getStaticData = async () => {
   const championIDArray = await getChampionIDArray(process.env.leaguePatch);
   //  get a list of champion icons
-  const championIconArray = championIDArray.map((id) => {
-    return {
-      id,
-      link: `http://ddragon.leagueoflegends.com/cdn/${process.env.leaguePatch}/img/champion/${id}.png`,
-    };
-  });
-  //  console.log(championIconArray);
+  const championIconArray = championIDArray.map((id) => ({
+    id,
+    link: `https://ddragon.leagueoflegends.com/cdn/${process.env.leaguePatch}/img/champion/${id}.png`,
+  }));
   // Pass data to the page via props
   return { props: { championIconArray } };
 };
@@ -25,13 +29,21 @@ const ChampionIndexPage = async () => {
   return (
     <div>
       <div className="grid grid-cols-9 gap-4">
-        {props.championIconArray.map(({ id, link }, index) => {
-          return (
-            <Link href={`/champions/${encodeURIComponent(id)}`} key={index}>
-              <img src={link} alt={link} key={index} />
-            </Link>
-          );
-        })}
+        {props.championIconArray.map(({ id, link }) => (
+          <Link
+            href={`/champions/${encodeURIComponent(id)}`}
+            key={`champ_${id}`}
+            className="relative h-[64px] w-[64px]"
+          >
+            <Image
+              src={link}
+              alt={link}
+              key={`champ_${id}_image`}
+              fill
+              sizes="64px"
+            />
+          </Link>
+        ))}
       </div>
     </div>
   );

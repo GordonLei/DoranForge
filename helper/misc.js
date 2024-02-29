@@ -6,7 +6,7 @@ Helper functions that do not fall into a category
 
 //  map an object with a function to return a new object
 export const objectMap = (obj, fn) => {
-  let mappedObject = {};
+  const mappedObject = {};
   //  console.log(Object.entries(obj));
   for (const [key, value] of Object.entries(obj)) {
     mappedObject[key] = fn(key, value);
@@ -28,7 +28,7 @@ export const objectMapArray = (obj, fn) => {
 
 //  case insensitive replace a word in the string
 export const caseInsensitiveReplace = (currStr, replaced, replacement) => {
-  const reg = new RegExp(new RegExp(replaced + "s?"), "gi");
+  const reg = new RegExp(new RegExp(`${replaced}s?`), "gi");
   return currStr.replace(reg, replacement);
 };
 
@@ -44,11 +44,7 @@ export const findWord = (base, find) => {
 
 //  check if an array is a subset of another
 export const checkSubset = (baseArray, subsetArray) => {
-  baseArray = baseArray.map((each) => {
-    return each.trim().toLowerCase();
-  });
-  subsetArray = subsetArray.map((each) => {
-    return each.trim().toLowerCase();
-  });
+  baseArray = baseArray.map((each) => each.trim().toLowerCase());
+  subsetArray = subsetArray.map((each) => each.trim().toLowerCase());
   return subsetArray.every((val) => baseArray.includes(val));
 };
