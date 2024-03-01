@@ -6,24 +6,27 @@ This component is that shop pop up where users can purchase and sell items
 
 */
 
-//  libraries
+//  imports
+//    npm packages
 import Image from "next/image";
 import { useState } from "react";
-import useSWRImmutable from "swr/immutable";
-//  helper functions
 import { useDispatch, useSelector } from "react-redux";
+import useSWRImmutable from "swr/immutable";
+//    lib folder functions
 import {
   addItem,
   removeItemById,
   inventorySelector,
 } from "@/lib/storeFeatures/inventory/inventorySlice";
 import { addStats, removeStats } from "@/lib/storeFeatures/stats/statsSlice";
+//  helper functions
 import {
   extractItemStatFromDict,
   checkInInventory,
   validateInventory,
 } from "../helper/lolItem";
 import { objectMapArray } from "../helper/misc";
+
 //  react-redux
 
 // Write a fetcher function to wrap the native fetch function and return the result of a call to url in json format
@@ -37,11 +40,11 @@ const fetcher = (url) =>
     });
 
 //  Shop component
-export default function Shop({ showShop }) {
-  /*
-  Vars
-  */
-
+export default function Shop({
+  showShop,
+  updatePressedPurchase,
+  pressedPurchase,
+}) {
   //  react-redux to use inventory slice
   const dispatch = useDispatch();
   const currentInventory = useSelector(inventorySelector);
@@ -79,8 +82,10 @@ export default function Shop({ showShop }) {
     event.stopPropagation();
     const item = parsedItemData[itemId];
     if (validateInventory(currentInventory, item)) {
-      dispatch(addItem(item));
-      dispatch(addStats(item));
+      const clone = { ...item, PP_id: pressedPurchase };
+      updatePressedPurchase();
+      dispatch(addItem(clone));
+      dispatch(addStats(clone));
     }
 
     /* setInventory(generateInventoryComponentInfo()); */
@@ -119,11 +124,11 @@ export default function Shop({ showShop }) {
   // Handle the ready state and display the result contained in the data object mapped to the structure of the json file
   if (showShop) {
     return (
-      <div className="flex overscroll-auto fixed ">
+      <div className="w-screen flex flex-row overscroll-y-auto fixed left-0 bg-slate-500">
         {/* This is the shop window */}
         {/* Left side panel that shows all the items */}
-        <div className="grid grid-cols-9 gap-2 bg-slate-500">
-          <div className="sticky h-screen  top-16 overflow-y-scroll overscroll-contain col-span-5 grid grid-cols-5 gap-2">
+        <div className="w-1/2 max-h-screen overflow-y-auto ">
+          <div className="sticky h-screen  grid grid-cols-5 gap-2">
             {parsedItemData &&
               Object.values(parsedItemData).map((item) => {
                 if (item.requiredAlly === "Ornn") {
@@ -171,11 +176,13 @@ export default function Shop({ showShop }) {
                 );
               })}
           </div>
-          {/* Right side panel that shows selected item description */}
-          <div className="sticky w-full col-span-4 pr-32">
-            {/* If an item is selected, then display it */}
-            {currItem < 0 || (
-              <div className="relative h-[64px] w-[64px]">
+        </div>
+        {/* Right side panel that shows selected item description */}
+        <div className="w-1/2">
+          {/* If an item is selected, then display it */}
+          {currItem < 0 || (
+            <div className="flex flex-col">
+              <div className="relative h-[64px] w-[64px] ">
                 {getItemInfo(currItem, "requiredAlly") !== "Ornn" || (
                   <Image
                     src="https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png"
@@ -194,51 +201,51 @@ export default function Shop({ showShop }) {
                   fill
                   sizes="64px"
                 />
-                <div>{getItemInfo(currItem, "name")}</div>
-                <div>{getItemInfo(currItem, "simpleDescription")}</div>
-                {/* Show the stats obtainable from buying the item */}
-                {objectMapArray(
-                  extractItemStatFromDict(getItemInfo(currItem, "stats")),
-                  (statName, value) => (
-                    <div key={`${statName}`}>{`${value} ${statName}`}</div>
-                  )
-                )}
-                {/* Map through all the item passives */}
-                {getItemInfo(currItem, "passives").map((currentPassive) => (
-                  /*
+              </div>
+              <div>{getItemInfo(currItem, "name")}</div>
+              <div>{getItemInfo(currItem, "simpleDescription")}</div>
+              {/* Show the stats obtainable from buying the item */}
+              {objectMapArray(
+                extractItemStatFromDict(getItemInfo(currItem, "stats")),
+                (statName, value) => (
+                  <div key={`${statName}`}>{`${value} ${statName}`}</div>
+                )
+              )}
+              {/* Map through all the item passives */}
+              {getItemInfo(currItem, "passives").map((currentPassive) => (
+                /*
                   Need a part to show Mythic Passives stats
                   */
-                  <div key={`${currentPassive.name}`}>
-                    {currentPassive.name}:{currentPassive.effects}
-                  </div>
-                ))}
-                {/* Map through all the item actives */}
-                {getItemInfo(currItem, "active").map((currentActive) => (
-                  <div key={`${currentActive.name}`}>
-                    {currentActive.name}:{currentActive.effects}
-                  </div>
-                ))}
-                {/* Button to buy the item */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    handlePurchase(e, getItemInfo(currItem, "id"));
-                  }}
-                >
-                  Purchase
-                </button>
-                {/* Button to sell the item  */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    handleSell(e, getItemInfo(currItem, "id"));
-                  }}
-                >
-                  Sell
-                </button>
-              </div>
-            )}
-          </div>
+                <div key={`${currentPassive.name}`}>
+                  {currentPassive.name}:{currentPassive.effects}
+                </div>
+              ))}
+              {/* Map through all the item actives */}
+              {getItemInfo(currItem, "active").map((currentActive) => (
+                <div key={`${currentActive.name}`}>
+                  {currentActive.name}:{currentActive.effects}
+                </div>
+              ))}
+              {/* Button to buy the item */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handlePurchase(e, getItemInfo(currItem, "id"));
+                }}
+              >
+                Purchase
+              </button>
+              {/* Button to sell the item  */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleSell(e, getItemInfo(currItem, "id"));
+                }}
+              >
+                Sell
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

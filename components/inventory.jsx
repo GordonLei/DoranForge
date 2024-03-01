@@ -5,12 +5,13 @@ This component is the button that opens up the
 */
 
 //  libraries
+//    npm packages
 import Image from "next/image";
-
 import { useState, useRef } from "react";
-//  react-redux
 import { useSelector } from "react-redux";
+//    lib folder functions
 import { inventorySelector } from "@/lib/storeFeatures/inventory/inventorySlice";
+//    components
 import Shop from "./shop";
 
 //  Inventory component
@@ -26,6 +27,8 @@ export default function Inventory() {
   //  react states
   //  might have to move this to the shop
   const [showShop, setShopVisibility] = useState(false);
+  //  this state is only here because I need unique ids for the items in the inventory but CANNOT use index when mapping
+  const [pressedPurchase, setPressedPurchase] = useState(0);
 
   /*
   Functions
@@ -48,18 +51,23 @@ export default function Inventory() {
     setHidden();
   };
 
+  //  handle incementing pressedPurchase
+  const handlePressedPurchase = () => {
+    setPressedPurchase(pressedPurchase + 1);
+    console.log("PP: ", pressedPurchase);
+  };
+
   /*
   return the component
   */
   return (
     <div>
       {/* The Shop component */}
-      <div className="absolute left-0 flex">
-        <div className="flex">
-          <Shop showShop={showShop} />
-          <div className="sticky top-16 h-20 content-center" />
-        </div>
-      </div>
+      <Shop
+        showShop={showShop}
+        updatePressedPurchase={handlePressedPurchase}
+        pressedPurchase={pressedPurchase}
+      />
 
       <div className="sticky top-16  h-20  content-center">
         {/* Inventory Section. */}
@@ -70,13 +78,13 @@ export default function Inventory() {
             return (
               <div
                 className="relative h-[64px] w-[64px]"
-                key={`${item.id} ornn border div  `}
+                key={`${item.id} ornn border div ${item.PP_id}`}
               >
                 {/* NOTE:  need to change this link so it auto updates to the current patch */}
                 <Image
                   src="https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png"
                   alt={`${item.name} ornn border`}
-                  key={`${item.id} ornn border`}
+                  key={`${item.id} ornn border ${item.PP_id}`}
                   className="absolute z-50"
                   fill
                   sizes="64px"
@@ -84,7 +92,7 @@ export default function Inventory() {
                 <Image
                   src={item.icon}
                   alt={`${item.name} png`}
-                  key={`${item.id}`}
+                  key={`${item.id}-${item.PP_id}`}
                   className="z-40"
                   fill
                   sizes="64px"
@@ -96,12 +104,15 @@ export default function Inventory() {
             return (
               <div
                 className="relative h-[64px] w-[64px]"
-                key={`${item.name} div`}
+                key={`${item.name} div  ${item.PP_id}`}
               >
+                {`${item.name} div  ${item.PP_id}`}
                 <Image
                   src={item.icon}
                   alt={`${item.name} png`}
-                  key={`${item.name} png`}
+                  key={`${item.name} png  ${item.PP_id}`}
+                  fill
+                  sizes="64px"
                 />
               </div>
             );

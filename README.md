@@ -8,3 +8,5 @@ TO DOS:
 - Make everything look better
 - Inventory.jsx --> Ornn border should use current patch border
 - Inventory.jsx --> Make sure if the icon does not exist, use a temporary image
+- Inventory.jsx --> tooltip on hover item
+- Shop.jsx --> Make item MATH information show up
