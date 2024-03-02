@@ -1,10 +1,20 @@
-import { getChampionInfo, parseStats } from "@/helper/lolstaticdata";
-import { existsSync, readFileSync } from "fs";
-import Inventory from "@/components/inventory";
+/*
+This is the SPECIFIC champion page
+*/
 
+//  libraries
+//    base JS packages
+import { existsSync, readFileSync } from "fs";
+//    helper packages
+import { getChampionInfo, parseStats } from "@/helper/lolstaticdata";
+//    components
+import Inventory from "@/components/inventory";
 import StatsMenu from "@/components/statsMenu";
 import SkillsMenu from "@/components/skillsMenu";
 
+//  external functions
+
+//  retrieve the Champion-specific JSON
 async function getChampionData(championName) {
   let championData;
   //
@@ -20,25 +30,21 @@ async function getChampionData(championName) {
   return championData;
 }
 
+/*
+Return the actual component
+*/
 const ChampionPage = async ({ params }) => {
-  //
+  //  call function to retrieve champion-specific information
   const championData = await getChampionData(params.championName);
   //  take all the releveant information from the championData stats
   const { baseStats, perLevelStats } = parseStats(championData.stats);
   /*
-  const [overflowScroll, setOverflowScroll] = useState(true);
+  render the pages
   */
-  //  const dispatch = useDispatch();
-
-  //  render portion
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row ">
+      {/* Page contents */}
       <div>
-        <div className="text-yellow-500">dasdsa</div>
-        <div className="text-cyan-400">dasdsa</div>
-        <div className="text-blue-700">dasdsa</div>
-        <div className="text-green-700">dasdsa</div>
-        <div className="text-red-800">dasdsa</div>
         <StatsMenu
           championData={championData}
           baseStats={baseStats}
@@ -50,12 +56,8 @@ const ChampionPage = async ({ params }) => {
           baseStats={baseStats}
         />
       </div>
-      <Inventory
-      /* inventory={inventory} */
-      /* setOverflowScroll={setOverflowScroll} */
-      /* setHidden={setHidden} */
-      /* setInventory={setInventory} */
-      />
+      {/* Inventory bar */}
+      <Inventory />
     </div>
   );
 };

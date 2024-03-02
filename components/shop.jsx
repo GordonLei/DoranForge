@@ -124,7 +124,7 @@ export default function Shop({
   // Handle the ready state and display the result contained in the data object mapped to the structure of the json file
   if (showShop) {
     return (
-      <div className="w-screen flex flex-row overscroll-y-auto fixed left-0 bg-slate-500">
+      <div className="w-screen flex flex-row overscroll-y-auto fixed left-0 bg-gradient-to-r from-blue-5 to-blue-7">
         {/* This is the shop window */}
         {/* Left side panel that shows all the items */}
         <div className="w-1/2 max-h-screen overflow-y-auto ">

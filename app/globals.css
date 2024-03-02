@@ -1,3 +1,47 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* Headings */
+  h1, h2, h3, h4, h5 {
+    @apply font-beaufort
+  }
+  h1 {
+    @apply text-[40pt] tracking-wider leading-[42pt] font-bold;
+  }
+
+  h2 {
+    @apply text-[28pt] tracking-wider leading-[32pt] font-bold;
+  }
+
+  h3 {
+    @apply text-[23pt] tracking-wider leading-[28pt] font-bold;
+  }
+
+  h4 {
+    @apply text-[18pt] tracking-wider leading-[22pt] font-bold;
+  }
+
+  h5 {
+    @apply text-[14pt] tracking-[0.075em] leading-[18pt] font-bold;
+  }
+  /* Body */
+  body {
+    @apply text-[14pt] tracking-[0.025em] leading-[20pt];
+  }
+}
+
+@layer components {
+  .bold-label{
+    @apply text-[11pt] tracking-wider leading-[16pt] font-bold;
+  }
+
+  .large-number {
+    @apply text-[57pt] tracking-[0.025em] leading-[62pt] font-beaufort font-medium;
+  }
+
+  .stat-number {
+    @apply text-[14pt] tracking-wider leading-[20pt] font-beaufort font-bold;
+  }
+}

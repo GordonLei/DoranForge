@@ -27,7 +27,7 @@ const ChampionIndexPage = async () => {
   const { props } = await getStaticData();
   //  console.log(props.championIconArray);
   return (
-    <div>
+    <div className="">
       <div className="grid grid-cols-9 gap-4">
         {props.championIconArray.map(({ id, link }) => (
           <Link

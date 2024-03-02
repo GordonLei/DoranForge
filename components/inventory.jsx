@@ -1,7 +1,7 @@
 "use client";
 
 /*
-This component is the button that opens up the 
+This component that shows the user's inventory and opens up the shop menu
 */
 
 //  libraries
@@ -17,7 +17,7 @@ import Shop from "./shop";
 //  Inventory component
 export default function Inventory() {
   /*
-  Vars
+  Variables + states
   */
 
   //  use the inventory slice
@@ -36,7 +36,6 @@ export default function Inventory() {
 
   //  toggle the shop overlay on or off
   const setHidden = () => {
-    //  console.log(document.body.style.overflow);
     if (document.body.style.overflow !== "hidden") {
       document.body.style.overflow = "hidden";
     } else {
@@ -54,7 +53,6 @@ export default function Inventory() {
   //  handle incementing pressedPurchase
   const handlePressedPurchase = () => {
     setPressedPurchase(pressedPurchase + 1);
-    console.log("PP: ", pressedPurchase);
   };
 
   /*
@@ -62,13 +60,13 @@ export default function Inventory() {
   */
   return (
     <div>
-      {/* The Shop component */}
+      {/* The Shop menu component */}
       <Shop
         showShop={showShop}
         updatePressedPurchase={handlePressedPurchase}
         pressedPurchase={pressedPurchase}
       />
-
+      {/* The actual inventory component */}
       <div className="sticky top-16  h-20  content-center">
         {/* Inventory Section. */}
         {/*   This displays the items in the inventory bar shown on the right */}
@@ -142,7 +140,6 @@ export default function Inventory() {
           />
         </button>
       </div>
-      {/* <Script src="/js/inventoryJS.js" strategy="lazyOnload" /> */}
     </div>
   );
 }

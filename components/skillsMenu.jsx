@@ -53,7 +53,7 @@ function SkillsMenu({ name, abilities, baseStats }) {
       {objectMapArray(currentAbilities, (key, value) => (
         <div key={`${key}_skill`} className="m-4 border-t-2">
           <div key={`${key}_name`}>
-            {`${key === "P" ? "Passive" : key}: ${value.name}`}
+            <h1>{`${key === "P" ? "Passive" : key}: ${value.name}`}</h1>
             {key !== "P" && (
               <select
                 name="level"
