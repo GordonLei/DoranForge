@@ -131,6 +131,9 @@ export default function Shop({
           <div className="sticky h-screen  grid grid-cols-5 gap-2">
             {parsedItemData &&
               Object.values(parsedItemData).map((item) => {
+                if (!item.shop.purchasable) {
+                  return null;
+                }
                 if (item.requiredAlly === "Ornn") {
                   return (
                     <div

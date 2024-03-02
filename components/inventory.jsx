@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { inventorySelector } from "@/lib/storeFeatures/inventory/inventorySlice";
 //    components
 import Shop from "./shop";
+import HoverableItem from "./hoverableItem";
 
 //  Inventory component
 export default function Inventory() {
@@ -70,60 +71,14 @@ export default function Inventory() {
       <div className="sticky top-16  h-20  content-center">
         {/* Inventory Section. */}
         {/*   This displays the items in the inventory bar shown on the right */}
-        {currentInventory.map((item) => {
+        {currentInventory.map((item) => (
           /* Map all of the item icons */
-          if (item.requiredAlly === "Ornn") {
-            return (
-              <div
-                className="relative h-[64px] w-[64px]"
-                key={`${item.id} ornn border div ${item.PP_id}`}
-              >
-                {/* NOTE:  need to change this link so it auto updates to the current patch */}
-                <Image
-                  src="https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png"
-                  alt={`${item.name} ornn border`}
-                  key={`${item.id} ornn border ${item.PP_id}`}
-                  className="absolute z-50"
-                  fill
-                  sizes="64px"
-                />
-                <Image
-                  src={item.icon}
-                  alt={`${item.name} png`}
-                  key={`${item.id}-${item.PP_id}`}
-                  className="z-40"
-                  fill
-                  sizes="64px"
-                />
-              </div>
-            );
-          }
-          if (item.icon) {
-            return (
-              <div
-                className="relative h-[64px] w-[64px]"
-                key={`${item.name} div  ${item.PP_id}`}
-              >
-                {`${item.name} div  ${item.PP_id}`}
-                <Image
-                  src={item.icon}
-                  alt={`${item.name} png`}
-                  key={`${item.name} png  ${item.PP_id}`}
-                  fill
-                  sizes="64px"
-                />
-              </div>
-            );
-          }
-          //  Will have to change this to do relevant thing when the ICON DOES NOT EXIST
-          return (
-            <Image
-              src={item.icon}
-              alt={`${item.name} png`}
-              key={`${item.name} png`}
-            />
-          );
-        })}
+          <HoverableItem
+            key={`${item.name}-${item.PP_id}-HI`}
+            itemData={item}
+            itemPPId={item.PP_id}
+          />
+        ))}
         {/* Button to open the shop menu */}
         <button
           id="openShop"
