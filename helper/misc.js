@@ -26,6 +26,12 @@ export const objectMapArray = (obj, fn) => {
   return mappedArray;
 };
 
+//  filter  an object with a function but return the result as an array
+export const objectFilterArray = (obj, fn) => {
+  const mappedArray = Object.entries(obj).filter(fn);
+  return mappedArray;
+};
+
 //  case insensitive replace a word in the string
 export const caseInsensitiveReplace = (currStr, replaced, replacement) => {
   const reg = new RegExp(new RegExp(`${replaced}s?`), "gi");

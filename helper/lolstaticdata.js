@@ -9,7 +9,7 @@ import {
   objectMap,
   caseInsensitiveReplace,
   findWord,
-  checkSubset
+  checkSubset,
 } from "./misc";
 
 //
@@ -19,20 +19,18 @@ get the related champion data from the JSON contained in merakianalytics
 */
 export const getChampionInfo = async (patchVersion, name) => {
   const lolStaticDataURL = `http://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/champions/${name}.json`;
-  return await axios
+  return axios
     .get(lolStaticDataURL)
     .then((response) => {
       //  ideally something to save the data into a file + folder
-      const data = response.data;
+      const { data } = response;
       //    for now, just check if the patchVersion matches the version from merakianalytics
-      console.log("what is this: " + data.icon.split("/")[4]);
       if (data.icon.split("/")[4] === patchVersion) {
         return data;
-      } else {
-        throw new Error(
-          "need to consult Merakianalytics; might be a mismatch in Patch # + need to update"
-        );
       }
+      throw new Error(
+        "need to consult Merakianalytics; might be a mismatch in Patch # + need to update"
+      );
     })
     .catch((err) => {
       console.log(
@@ -58,7 +56,7 @@ export const parseStats = (stats) => {
     moveSpeed: stats.movespeed.flat,
     attackRange: stats.attackRange.flat,
     abilityPower: 0,
-    crit: 0
+    crit: 0,
   };
 
   const perLevelStats = {
@@ -73,7 +71,7 @@ export const parseStats = (stats) => {
     moveSpeedPerLevel: stats.movespeed.perLevel,
     attackRangePerLevel: stats.attackRange.perLevel,
     abilityPowerPerLevel: 0,
-    critPerLevel: 0
+    critPerLevel: 0,
   };
   return { baseStats, perLevelStats };
 };
@@ -83,43 +81,39 @@ export const parseStats = (stats) => {
 export const combineAbilityDescriptions = (abilitiesObject) => {
   const combinedAbilityDescriptionsObject = objectMap(
     abilitiesObject,
-    (key, value) => {
+    (key, value) =>
       //  now map through the array that is the value of the key
       //    recall that the key-value pair looks like "P"-[{name:...}, {}, ...]
-      return value
-        .map((eachAbilityComponent) => {
+      value
+        .map((eachAbilityComponent) =>
           //  recall eachAbilityComponent has an effects array that contains descriptions
-          return eachAbilityComponent.effects
-            .map((eachEffectComponent) => {
-              //  recall eachEffectComponent like {description: ..., leveling:[...], ... }
-              return eachEffectComponent.description;
-            })
-            .join(" ");
-        })
-        .join(" ");
-    }
+          eachAbilityComponent.effects
+            .map(
+              (eachEffectComponent) =>
+                //  recall eachEffectComponent like {description: ..., leveling:[...], ... }
+                eachEffectComponent.description
+            )
+            .join(" ")
+        )
+        .join(" ")
   );
   return combinedAbilityDescriptionsObject;
 };
 
 //  combine the names of abilities if applicable (if the name contains multiple words)
 export const combineNames = (abilitiesObject) => {
-  const combinedNamesObject = objectMap(abilitiesObject, (key, value) => {
+  const combinedNamesObject = objectMap(abilitiesObject, (key, value) =>
     //  now map through the array that is the value of the key
     //    recall that the key-value pair looks like "P"-[{name:...}, {}, ...]
-    return value
-      .map((eachAbilityComponent) => {
-        return eachAbilityComponent.name;
-      })
-      .join(" ");
-  });
+    value.map((eachAbilityComponent) => eachAbilityComponent.name).join(" ")
+  );
   return combinedNamesObject;
 };
 
 //  Master function to create an object where abilities + passives are mapped  to letters / buttons
 export const formatAbilities = (abilitiesObject) => {
   //  final formatted object
-  let formatted = { P: {}, Q: {}, W: {}, E: {}, R: {} };
+  const formatted = { P: {}, Q: {}, W: {}, E: {}, R: {} };
   const abilityID = ["P", "Q", "W", "E", "R"];
   //  add the descriptions
   const combinedDescriptions = combineAbilityDescriptions(abilitiesObject);
@@ -134,7 +128,7 @@ export const formatAbilities = (abilitiesObject) => {
       ...formatAbilities[ability],
       name: combinedNames[ability],
       description: combinedDescriptions[ability],
-      tooltip: combinedDescriptions[ability]
+      tooltip: combinedDescriptions[ability],
     };
   });
   return formatted;
@@ -155,7 +149,7 @@ const numerize = (
     moveSpeed: 1,
     attackRange: 1,
     crit: 0,
-    abilityPower: 0
+    abilityPower: 0,
   },
   baseStats = {
     health: 1,
@@ -169,62 +163,70 @@ const numerize = (
     moveSpeed: 1,
     attackRange: 1,
     crit: 0,
-    abilityPower: 0
+    abilityPower: 0,
   }
 ) => {
   const oldText = text;
-  const modifierComponents = oldText.split("+").map((each) => {
-    return each.trim();
-  });
+  const modifierComponents = oldText.split("+").map((each) => each.trim());
+  console.log("MODIFIERS:", modifierComponents);
   const numerizedText = modifierComponents.reduce(
     (accumulator, currentValue) => {
-      //  if isNaN returns true, then the variable is NOT a valid number
-      //  console.log(currentValue);
-      //  if the current thing is not a number, return the current count
-      if (!isNaN(currentValue)) {
-        return accumulator + parseInt(currentValue);
-      } else {
-        //  split the value to seperate number and stat value
-        const baseArray = currentValue.split(" ");
-        //  console.log("BA", baseArray);
-
-        //  if you are AP AND AD, calculate the mix-dmg ratio
-        if (checkSubset(baseArray, ["ap", "ad"])) {
-          return (
-            accumulator +
-            (parseFloat(baseArray[0]) / 100.0) * currentStats["attackDamage"] +
-            (parseFloat(baseArray[0]) / 100.0) * currentStats["abilityPower"]
-          );
-        } else if (checkSubset(baseArray, ["bonus", "ad"])) {
-          return (
-            accumulator +
-            (parseFloat(baseArray[0]) / 100.0) *
-              (currentStats["attackDamage"] - baseStats["attackDamage"])
-          );
-        } else if (checkSubset(baseArray, ["bonus", "ap"])) {
-          return (
-            accumulator +
-            (parseFloat(baseArray[0]) / 100.0) *
-              (currentStats["abilityPower"] - baseStats["abilityPower"])
-          );
-        } else if (checkSubset(baseArray, ["ad"])) {
-          return (
-            accumulator +
-            (parseFloat(baseArray[0]) / 100.0) * currentStats["attackDamage"]
-          );
-        } else if (checkSubset(baseArray, ["ap"])) {
-          //  console.log(currentStats["abilityPower"]);
-          return (
-            accumulator +
-            (parseFloat(baseArray[0]) / 100.0) * currentStats["abilityPower"]
-          );
-        }
+      //    if current value is a number and is NOT a percent, just add it
+      if (!currentValue.includes("%") && parseFloat(currentValue)) {
+        return accumulator + parseFloat(currentValue, 10);
       }
+      //  split the value to seperate number and stat value
+      const baseArray = currentValue.split(" ");
+      //  remove percent sign
+      baseArray[0] = baseArray[0].replace("%", "");
+      //  If this value is not a number, an error occured
+      if (Number.isNaN(parseFloat(baseArray[0]))) {
+        console.log("ERROR IN LOLSTATDATA NUMERIZE");
+        return -1;
+      }
+      //  if you are AP AND AD, calculate the mix-dmg ratio
+      if (checkSubset(baseArray, ["ap", "ad"])) {
+        return (
+          accumulator +
+          (parseFloat(baseArray[0]) / 100.0) * currentStats.attackDamage +
+          (parseFloat(baseArray[0]) / 100.0) * currentStats.abilityPower
+        );
+      }
+      if (checkSubset(baseArray, ["bonus", "ad"])) {
+        return (
+          accumulator +
+          (parseFloat(baseArray[0]) / 100.0) *
+            (currentStats.attackDamage - baseStats.attackDamage)
+        );
+      }
+      if (checkSubset(baseArray, ["bonus", "ap"])) {
+        return (
+          accumulator +
+          (parseFloat(baseArray[0]) / 100.0) *
+            (currentStats.abilityPower - baseStats.abilityPower)
+        );
+      }
+      if (checkSubset(baseArray, ["ad"])) {
+        return (
+          accumulator +
+          (parseFloat(baseArray[0]) / 100.0) * currentStats.attackDamage
+        );
+      }
+      if (checkSubset(baseArray, ["ap"])) {
+        //  console.log(currentStats["abilityPower"]);
+        return (
+          accumulator +
+          (parseFloat(baseArray[0]) / 100.0) * currentStats.abilityPower
+        );
+      }
+      //
+      console.log("POTENTIAL ERROR in Numerize Function", baseArray);
+      return accumulator;
     },
     0
   );
-  //  console.log(numerizedText);
-  //  console.log(modifierComponents);
+  console.log("NT: ", numerizedText);
+  console.log("MC: ", modifierComponents);
   if (!numerizedText) {
     return oldText;
   }
@@ -240,7 +242,7 @@ const modifyAttribute = (championName, attribute) => {
       attribute.includes("total")) &&
     championName === "Aatrox"
   ) {
-    return attribute.replace("damage", "") + "physical damage";
+    return `${attribute.replace("damage", "")}physical damage`;
   }
   return attribute;
 };
@@ -249,21 +251,22 @@ const modifyAttribute = (championName, attribute) => {
 const prepStylize = (
   championName,
   abilitiesObject,
+
+  currentStats,
+  baseStats,
   pointAllocation = {
     Q: 1,
     W: 1,
     E: 1,
-    R: 1
-  },
-  currentStats,
-  baseStats
+    R: 1,
+  }
 ) => {
   const skillNames = {
     Q: [],
     W: [],
     E: [],
     R: [],
-    P: []
+    P: [],
   };
   const prepped = objectMap(abilitiesObject, (key, value) => {
     //  for each ability, get  the tooltip and map...
@@ -315,12 +318,11 @@ const prepStylize = (
             //    that combines the values and units
             //  this represents an array with all the numerical changes to a skill at a specific point allocation
             const modifiers = eachLevelComponent.modifiers.map(
-              (modifierObject) => {
+              (modifierObject) =>
                 //  console.log(modifierObject);
-                return `${modifierObject.values[allocatedPoints - 1]}${
+                `${modifierObject.values[allocatedPoints - 1]}${
                   modifierObject.units[allocatedPoints - 1]
-                }`;
-              }
+                }`
             );
             //  console.log(modifiers);
             //  replace the attribute with the modifiers
@@ -345,15 +347,17 @@ const prepStylize = (
               "maximum",
               "cast",
               "sweetspot",
-              "healing"
+              "healing",
             ];
             //  for now, if the decription has some of these keywords and they are not replaced, add it to the end of the description
-            for (let i = 0; i < keyword.length; i++) {
+            for (let i = 0; i < keyword.length; i += 1) {
               if (attribute.includes(keyword[i])) {
                 modifiedDescription += `<seperate> ${replacement} </seperate> `;
                 break;
               }
             }
+            //  does not matter what we return here. this is here to solve ESLINT error
+            return 0;
           });
           return modifiedDescription;
         });
@@ -363,17 +367,18 @@ const prepStylize = (
   });
   //  now add the names
 
-  prepped["P"].name = skillNames["P"].join(" ");
-  prepped["Q"].name = skillNames["Q"].join(" ");
-  prepped["W"].name = skillNames["W"].join(" ");
-  prepped["E"].name = skillNames["E"].join(" ");
-  prepped["R"].name = skillNames["R"].join(" ");
+  prepped.P.name = skillNames.P.join(" ");
+  prepped.Q.name = skillNames.Q.join(" ");
+  prepped.W.name = skillNames.W.join(" ");
+  prepped.E.name = skillNames.E.join(" ");
+  prepped.R.name = skillNames.R.join(" ");
 
   return prepped;
 };
 
-//  this will parse through a description and replace the equations with numbers
-const lolTextParser = (text, skillButtonName) => {
+//  this will parse through a description and add colors to the numbers + type
+const lolTextParser = (propText, skillButtonName) => {
+  let text = propText;
   //  this will represent a sentence
   const sentence = [];
   //  look for flags that look like <attribute> ... </attribute>
@@ -385,13 +390,13 @@ const lolTextParser = (text, skillButtonName) => {
     //  take anything before the marker and
     sentence.push({
       format: "normal",
-      text: text.substring(0, startIndex)
+      text: text.substring(0, startIndex),
     });
     //  check for a flag of newline ???
     if (keyword === "seperate") {
       sentence.push({
         format: "seperate",
-        text: ""
+        text: "",
       });
       text = text.replace("<seperate>", "").replace("</seperate>", "");
       startIndex = text.indexOf("<");
@@ -404,7 +409,7 @@ const lolTextParser = (text, skillButtonName) => {
     //  push the thing within the text
     sentence.push({
       format: seperateFlag ? `seperate ${keyword}` : keyword,
-      text: text.substring(endIndex + 1, closer) + " " + keyword
+      text: `${text.substring(endIndex + 1, closer)} ${keyword}`,
     });
     //  add 3 to account for 2 chars of </, 1 char for the space the closing >
     text = text.substring(closer + keyword.length + 3);
@@ -412,78 +417,79 @@ const lolTextParser = (text, skillButtonName) => {
   //  push the remainder as normal formatted text
   sentence.push({ format: "normal", text });
   //  console.log("SENTENCE:", sentence);
-  //now create the divs
+  // now create the divs
   //  colorize words with specific meanings
-  return sentence.map(({ format, text }, index) => {
-    const potentialClass = format.includes("seperate") ? " seperateStat " : "";
-    switch (format) {
-      case findWord(format, "heal"):
+  return sentence.map((item, index) => {
+    const potentialClass = item.format.includes("seperate")
+      ? " seperateStat "
+      : "";
+    switch (item.format) {
+      case findWord(item.format, "heal"):
         return (
           <span
             className={`text-green-700 ${potentialClass}`}
             key={`${skillButtonName}_${index}`}
           >
-            {text}
+            {item.text}
           </span>
         );
-      case findWord(format, "slow"):
+      case findWord(item.format, "slow"):
         return (
           <span
             className={`text-cyan-400 ${potentialClass}`}
             key={`${skillButtonName}_${index}`}
           >
-            {text}
+            {item.text}
           </span>
         );
-      case findWord(format, "magic damage"):
+      case findWord(item.format, "magic damage"):
         return (
           <span
             className={`text-blue-700 ${potentialClass}`}
             key={`${skillButtonName}_${index}`}
           >
-            {text}
+            {item.text}
           </span>
         );
-      case findWord(format, "physical damage"):
-      case findWord(format, "attack damage"):
+      case findWord(item.format, "physical damage"):
+      case findWord(item.format, "attack damage"):
         return (
           <span
             className={`text-red-800 ${potentialClass}`}
             key={`${skillButtonName}_${index}`}
           >
-            {text}
+            {item.text}
           </span>
         );
 
-      case findWord(format, "movement speed"):
+      case findWord(item.format, "movement speed"):
         return (
           <span
             className={`text-yellow-500 ${potentialClass}`}
             key={`${skillButtonName}_${index}`}
           >
-            {text}
+            {item.text}
           </span>
         );
-      case findWord(format, "seperate"):
-        return <br key={`${skillButtonName}_${index}`}></br>;
-      case findWord(format, "normal"):
+      case findWord(item.format, "seperate"):
+        return <br key={`${skillButtonName}_${index}`} />;
+      case findWord(item.format, "normal"):
       default:
-        return <span key={`${skillButtonName}_${index}`}> {text} </span>;
+        return <span key={`${skillButtonName}_${index}`}> {item.text} </span>;
     }
   });
 };
 //  master "stylize" function that replaces equations and add colors
 const stylize = (abilitiesObject) => {
+  const ao = abilitiesObject;
   const skillButonNames = ["P", "Q", "W", "E", "R"];
   skillButonNames.forEach((name) => {
-    abilitiesObject[name].tooltip = abilitiesObject[name].tooltip.map(
-      (part) => {
-        return lolTextParser(part, name);
-      }
+    ao[name].tooltip = ao[name].tooltip.map((part) =>
+      lolTextParser(part, name)
     );
   });
 
-  return abilitiesObject;
+  return ao;
 };
 
 //  Master function that parses champion ability formation with the stats and return desired information
@@ -499,9 +505,9 @@ export const parse = (
   parsedAO = prepStylize(
     championName,
     abilitiesObject,
-    pointAllocation,
     currentStats,
-    baseStats
+    baseStats,
+    pointAllocation
   );
   //  parsedAO = convertToStats(parsedAO, stats);
   //  now add the specific stylizations
@@ -516,17 +522,16 @@ export const parse = (
 
 export const getAllItemInfo = async () => {
   const lolStaticDataURL = `http://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/items.json`;
-  return await axios
+  return axios
     .get(lolStaticDataURL)
     .then((response) => {
       //  ideally something to save the data into a file + folder
-      const data = response.data;
+      const { data } = response;
       //    for now, just check if the patchVersion matches the version from merakianalytics
       if (data) {
         return data;
-      } else {
-        throw new Error("need to consult DDragon");
       }
+      throw new Error("need to consult DDragon");
     })
     .catch((err) => {
       console.log(

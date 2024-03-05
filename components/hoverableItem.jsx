@@ -8,7 +8,8 @@ This component is an item that can be hovered to show its relevant information
 //    npm packages
 import { Divider, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
-//    lib folder functions
+//    helper folder functions
+import { extractItemStatFromDict } from "@/helper/lolItem";
 //    components
 
 //  Inventory component
@@ -62,7 +63,10 @@ export default function HoverableItem({
             </div>
           </div>
           <Divider className="my-4" />
-          <div>{/* Stats */}</div>
+          {/* Stats */}
+          <div className="flex flex-col">
+            {console.log(extractItemStatFromDict(itemData.stats))}
+          </div>
           <div>{/* Active / Passives */}</div>
         </div>
       }
