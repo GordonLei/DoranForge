@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const colors = require("tailwindcss/colors");
 
 module.exports = {
   content: [
@@ -38,6 +39,12 @@ module.exports = {
     "grey-3",
     "grey-cool",
     "hextech-black",
+    /*  colors for text */
+    "heal-color",
+    "slow-color",
+    "magicDamage-color",
+    "attackDamage-color",
+    "moveSpeed-color",
   ],
   theme: {
     extend: {
@@ -70,6 +77,12 @@ module.exports = {
         "grey-3": "#1E2328",
         "grey-cool": "#1E282D",
         "hextech-black": "#010A13",
+        /*  colors for text */
+        "heal-color": colors.green[700],
+        "slow-color": colors.cyan[400],
+        "magicDamage-color": colors.blue[700],
+        "attackDamage-color": colors.red[800],
+        "moveSpeed-color": colors.yellow[500],
       },
     },
   },

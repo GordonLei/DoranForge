@@ -4,9 +4,8 @@ TO DOS:
 
 # MAJOR PROBLEMS:
 
-- Math calculations seem extremely wrong.
-- Buying items does not modify skill damages
 - Inventory.jsx --> tooltip on hover item
+- If skills need target max health, add it to the skill description calculation (ex. 60 + 4% max hp)
 - Shop.jsx --> Make item MATH information show up
 
 # MINOR PROBLEMS:
@@ -17,3 +16,5 @@ TO DOS:
 - Make everything look better
 - Inventory.jsx --> Ornn border should use current patch border
 - Inventory.jsx --> Make sure if the icon does not exist, use a temporary image
+- Item hit effect and tip have to add symbols
+- Need to round to 2 decimals for Item numerized stats

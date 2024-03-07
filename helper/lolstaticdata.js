@@ -168,7 +168,6 @@ const numerize = (
 ) => {
   const oldText = text;
   const modifierComponents = oldText.split("+").map((each) => each.trim());
-  console.log("MODIFIERS:", modifierComponents);
   const numerizedText = modifierComponents.reduce(
     (accumulator, currentValue) => {
       //    if current value is a number and is NOT a percent, just add it
@@ -219,14 +218,14 @@ const numerize = (
           (parseFloat(baseArray[0]) / 100.0) * currentStats.abilityPower
         );
       }
-      //
-      console.log("POTENTIAL ERROR in Numerize Function", baseArray);
+      if (!modifierComponents[0].includes("%")) {
+        console.log("POTENTIAL ERROR in Numerize Function", baseArray);
+      }
+      //  This is the default retun if you are a % but have no ap / ad value
       return accumulator;
     },
     0
   );
-  console.log("NT: ", numerizedText);
-  console.log("MC: ", modifierComponents);
   if (!numerizedText) {
     return oldText;
   }
