@@ -71,17 +71,19 @@ export default function HoverableItem({
           <Divider className="my-4" />
           {/* Stats */}
           <div className="flex flex-col">
-            {console.log(extractItemStatFromDict(itemData.stats))}
+            {parsedItemData.statArray.map((eachStat, index) => (
+              <div key={`${index}-${eachStat.name}`}>{eachStat.text}</div>
+            ))}
           </div>
           {/* Active / Passives */}
           <div className="flex flex-col">
             {/* Actives */}
             {parsedItemData.active.map((eachActive, index) => (
-              <div key={`${index} item`}>{eachActive}</div>
+              <div key={`${index}-${eachActive.name}`}>{eachActive.text}</div>
             ))}
             {/* Passives */}
             {parsedItemData.passives.map((eachPassive, index) => (
-              <div key={`${index} item`}>{eachPassive}</div>
+              <div key={`${index}-${eachPassive.name}`}>{eachPassive.text}</div>
             ))}
           </div>
         </div>

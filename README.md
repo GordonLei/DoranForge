@@ -2,13 +2,17 @@ Access [http://localhost:3000/champions](http://localhost:3000/champions) and pr
 
 TO DOS:
 
-# MAJOR PROBLEMS:
+# Working on
 
 - Inventory.jsx --> tooltip on hover item
-- If skills need target max health, add it to the skill description calculation (ex. 60 + 4% max hp)
 - Shop.jsx --> Make item MATH information show up
 
-# MINOR PROBLEMS:
+# MAJOR PROBLEMS
+
+- If skills need target max health, add it to the skill description calculation (ex. 60 + 4% max hp)
+- Fix "mapped" component keys (problem lies in having purchased multiple of the same item. need to differentiate same items)
+
+# MINOR PROBLEMS
 
 - Buying mana items should not increase the mana for Energy / Fury champions
   - Would be nice to have these champs have "energy / fury" shown up as text instead of "mana"

@@ -69,6 +69,7 @@ export const reduxValidateInventory = (state, newItem) => {
   if (validateInventory(state, newItem)) {
     return [...state, newItem];
   }
+  return [...state];
 };
 
 //  skeleton of a function that was going to be used but now not sure
@@ -76,15 +77,18 @@ export const reduxValidateInventory = (state, newItem) => {
 
 //  stylize the stats of an item
 export const stylizeStats = (statName, statValue) => {
+  console.log("SS", statName, statValue);
   switch (statName) {
     case "attackDamage":
-      return <div>Yes</div>;
+      return {
+        name: statName,
+        text: `${statValue} ${statName}`,
+      };
     default:
-      return (
-        <div>
-          {statName} {statValue}
-        </div>
-      );
+      return {
+        name: statName,
+        text: `${statValue} ${statName}`,
+      };
   }
 };
 
@@ -244,19 +248,21 @@ const numerize = (formattedPassives, currentStats) => {
 };
 
 //  Optional Step: maybe not necessary. check if item has special conditions
+/* eslint-disable-next-line no-unused-vars */
 const modifyAttribute = (itemName, attribute) => attribute;
 
 //  Step 3: this will colorize the text and leave it in its final form
 const colorizeAndFinalize = (numerizedPassives) => {
-  const colorizedPassives = numerizedPassives.map((eachPassive) =>
-    eachPassive.map((eachEffect, index) => {
+  const colorizedPassives = numerizedPassives.map((eachPassive) => {
+    const passiveName = eachPassive[0].text;
+    const passiveText = eachPassive.map((eachEffect, index) => {
       switch (eachEffect.format) {
         //  attack damage
         case "AD":
         case "physical damage": {
           if (eachEffect.range && eachEffect.range === "melee") {
             return (
-              <span key={`${"IDK"}_${index}`} className="text-red-800">
+              <span key={`${passiveName}_${index}`} className="text-red-800">
                 {" "}
                 melee {eachEffect.text} /
               </span>
@@ -264,7 +270,7 @@ const colorizeAndFinalize = (numerizedPassives) => {
           }
           if (eachEffect.range && eachEffect.range === "ranged") {
             return (
-              <span key={`${"IDK"}_${index}`} className="text-red-800">
+              <span key={`${passiveName}_${index}`} className="text-red-800">
                 {" "}
                 ranged {eachEffect.text}{" "}
               </span>
@@ -272,7 +278,7 @@ const colorizeAndFinalize = (numerizedPassives) => {
           }
           if (!eachEffect.range) {
             return (
-              <span key={`${"IDK"}_${index}`} className="text-red-800">
+              <span key={`${passiveName}_${index}`} className="text-red-800">
                 {eachEffect.text}
               </span>
             );
@@ -282,11 +288,11 @@ const colorizeAndFinalize = (numerizedPassives) => {
 
         //  attack effect
         case "attack effect": {
-          return <span key={`${"IDK"}_${index}`}>{eachEffect.text}</span>;
+          return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
         }
         //  specific tip effects
         case "tip effect": {
-          return <span key={`${"IDK"}_${index}`}>{eachEffect.text}</span>;
+          return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
         }
         //  name
         case "name": {
@@ -299,7 +305,7 @@ const colorizeAndFinalize = (numerizedPassives) => {
         }
         //  normal
         case "normal": {
-          return <span key={`${"IDK"}_${index}`}>{eachEffect.text}</span>;
+          return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
         }
         //  default catch-all for errors
         default: {
@@ -309,11 +315,15 @@ const colorizeAndFinalize = (numerizedPassives) => {
             "and text is ",
             eachEffect.text
           );
-          return <span key={`${"IDK"}_${index}`}>{eachEffect.text}</span>;
+          return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
         }
       }
-    })
-  );
+      //
+      console.log("Possible error in colorize and finalize");
+      return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
+    });
+    return { name: passiveName, text: passiveText };
+  });
   return colorizedPassives;
 };
 
@@ -351,6 +361,7 @@ export const parseItemData = (championName, currentStats, itemData) => {
   const statArray = Object.entries(parsedItemStats).map(([key, value]) =>
     stylizeStats(key, value)
   );
+  console.log("SA", statArray);
   masterRes.statArray = statArray;
   //  console.log(itemData);
   //  this following section is related to parsing item passive and actives
@@ -360,6 +371,7 @@ export const parseItemData = (championName, currentStats, itemData) => {
     currentStats
   );
   masterRes.passives = passives;
+  console.log("P", passives);
   masterRes.active = active;
   return masterRes;
 };
