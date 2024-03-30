@@ -22,3 +22,4 @@ TO DOS:
 - Inventory.jsx --> Make sure if the icon does not exist, use a temporary image
 - Item hit effect and tip have to add symbols
 - Need to round to 2 decimals for Item numerized stats
+- Replace logo image in navbar

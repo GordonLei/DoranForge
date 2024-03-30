@@ -1,6 +1,9 @@
 // app/layout.tsx
 import localFont from "next/font/local";
+import HextechNavbar from "@/components/ui/hextechNavbar";
 import Providers from "./providers";
+
+//
 
 // These styles apply to every route in the application
 import "./globals.css";
@@ -44,13 +47,10 @@ const spiegel = localFont({
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`dark ${spiegel.variable} ${beaufort.variable} `}
-    >
+    <html lang="en" className={`${spiegel.variable} ${beaufort.variable} `}>
       <body>
         <Providers>
-          <div className="text-lime-500">Layout works</div>
+          <HextechNavbar />
           <main>{children}</main>
         </Providers>
       </body>

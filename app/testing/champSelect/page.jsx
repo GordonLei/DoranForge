@@ -6,7 +6,7 @@ This is the root page that shows all the champions in a grid
 //    npm packages
 import Image from "next/image";
 import Link from "next/link";
-import { getChampionIDArray } from "../../helper/datadragon";
+import { getChampionIDArray } from "@/helper/datadragon";
 
 //
 //  page data is fetched once and cached, not refetched on every load
