@@ -3,6 +3,7 @@ Helper code for DataDragon JSON files
 */
 
 import axios from "axios";
+
 const ddragonBaseURL = `http://ddragon.leagueoflegends.com/cdn/`;
 
 /*
@@ -12,9 +13,7 @@ export const getChampionJson = async (patchVersion) => {
   const ddragonChampionJsonURL = `${ddragonBaseURL}${patchVersion}/data/en_US/champion.json`;
   return await axios
     .get(ddragonChampionJsonURL)
-    .then((response) => {
-      return response.data.data;
-    })
+    .then((response) => response.data.data)
     .catch((err) => {
       console.log(
         "==========\n",
@@ -60,9 +59,7 @@ export const getChampionInfo = async (patchVersion, name) => {
   return await axios
     .get(ddragonChampionURL)
     //  get the data field from response's data
-    .then((response) => {
-      return response.data.data[name];
-    })
+    .then((response) => response.data.data[name])
     .catch((err) => {
       console.log(
         "==========\n",
@@ -89,7 +86,7 @@ export const parseStats = (stats) => {
     attackSpeed: stats.attackspeed,
     moveSpeed: stats.movespeed,
     attackRange: stats.attackrange,
-    crit: stats.crit
+    crit: stats.crit,
   };
   const perLevelStats = {
     hpPerLevel: stats.hpperlevel,
@@ -100,7 +97,7 @@ export const parseStats = (stats) => {
     mpRegenPerLevel: stats.mpregenperlevel,
     critPerLevel: stats.critperlevel,
     attackDamagePerLevel: stats.attackdamageperlevel,
-    attackSpeedPerLevel: stats.attackspeedperlevel
+    attackSpeedPerLevel: stats.attackspeedperlevel,
   };
   return { baseStats, perLevelStats };
 };
@@ -109,7 +106,7 @@ export const parseStats = (stats) => {
 format the data to map skills to buttons and then add the passive information
 */
 export const formatSkillsAndPassive = (championInfo) => {
-  let unparsedSkills = {};
+  const unparsedSkills = {};
   const skillNames = ["Q", "W", "E", "R"];
   for (let index = 0; index < skillNames.length; index++) {
     unparsedSkills[skillNames[index]] = championInfo.spells[index];

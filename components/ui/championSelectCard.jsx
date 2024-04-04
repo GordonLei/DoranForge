@@ -1,44 +1,47 @@
-import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Divider,
-  Link,
-  Image,
-} from "@nextui-org/react";
+"use client";
 
-export default function ChampionSelectCard() {
+import Link from "next/link";
+import Image from "next/image";
+
+export default function ChampionSelectCard({
+  id,
+  name,
+  iconPath,
+  defaultLoadingScreenPath,
+}) {
+  /*
+<a href={`/champions/${encodeURIComponent(id)}`}>
+  */
   return (
-    <Card className="max-w-[400px]">
-      <CardHeader className="flex gap-3">
+    <Link
+      href={`/champions/${name}`}
+      key={`champ_${id}`}
+      className="container relative h-80 max-w-40"
+    >
+      <div className="container relative h-80 max-w-40">
         <Image
           alt="nextui logo"
-          height={40}
-          radius="sm"
-          src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
-          width={40}
+          src={defaultLoadingScreenPath}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="rounded-md max-h-80 max-w-40"
         />
-        <div className="flex flex-col">
-          <p className="text-md">NextUI</p>
-          <p className="text-small text-default-500">nextui.org</p>
+        <div className="w-full max-w-40 max-h-16 p-2 absolute bottom-0 left-0 flex flex-row bg-blue-4 z-40 items-center justify-center rounded-b-md border-b">
+          <Image
+            alt="nextui logo"
+            height={32}
+            width={32}
+            radius="sm"
+            src={iconPath}
+          />
+          <div className="text-center ml-4">{name}</div>
         </div>
-      </CardHeader>
-      <Divider />
-      <CardBody>
-        <p>Make beautiful websites regardless of your design experience.</p>
-      </CardBody>
-      <Divider />
-      <CardFooter>
-        <Link
-          isExternal
-          showAnchorIcon
-          href="https://github.com/nextui-org/nextui"
-        >
-          Visit source code on GitHub.
-        </Link>
-      </CardFooter>
-    </Card>
+      </div>
+    </Link>
   );
 }
+
+/*
+
+
+*/
