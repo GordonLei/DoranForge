@@ -24,7 +24,7 @@ export default function HextechNavbar() {
   return (
     <Navbar
       onMenuOpenChange={setIsMenuOpen}
-      className="bg-hextech-black bg-opacity-95 text-grey-1 border-gold-4"
+      className="bg-hextech-black bg-opacity-95 text-grey-1 border-gold-4 z-50"
       isBordered
     >
       <NavbarContent>

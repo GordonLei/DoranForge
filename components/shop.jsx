@@ -124,7 +124,7 @@ export default function Shop({
   // Handle the ready state and display the result contained in the data object mapped to the structure of the json file
   if (showShop) {
     return (
-      <div className="w-screen flex flex-row overscroll-y-auto fixed left-0 bg-gradient-to-r from-blue-5 to-blue-7">
+      <div className="w-screen flex flex-row overscroll-y-auto fixed left-0 bg-gradient-to-r from-blue-5 to-blue-7 ">
         {/* This is the shop window */}
         {/* Left side panel that shows all the items */}
         <div className="w-1/2 max-h-screen overflow-y-auto ">
@@ -181,11 +181,11 @@ export default function Shop({
           </div>
         </div>
         {/* Right side panel that shows selected item description */}
-        <div className="w-1/2">
+        <div className="w-1/2 text-grey-1">
           {/* If an item is selected, then display it */}
           {currItem < 0 || (
             <div className="flex flex-col">
-              <div className="relative h-[64px] w-[64px] ">
+              <div className="relative h-[64px] w-[64px]">
                 {getItemInfo(currItem, "requiredAlly") !== "Ornn" || (
                   <Image
                     src="https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png"
