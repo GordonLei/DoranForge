@@ -1,30 +1,24 @@
-"use client";
-
-import { useState } from "react";
-
-function Header({ title }) {
-  return <h1>{title ? title : "Default title"}</h1>;
-}
+import { Button, Image } from "@nextui-org/react";
 
 export default function HomePage() {
-  const names = ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"];
-  const [likes, setLikes] = useState(0);
-
-  function handleClick() {
-    setLikes(likes + 1);
-  }
-
   return (
-    <div>
-      <Header title="Develop. Preview. Ship. 🚀" />
-      <ul>
-        {names.map((name) => (
-          <li key={name}>{name}</li>
-        ))}
-      </ul>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-
-      <button onClick={handleClick}>Like ({likes})</button>
+    <div className="flex flex-row justify-center items-center space-x-64 h-[calc(100vh-88px)]">
+      <div className="flex-col space-y-16 text-center">
+        <h1 className="text-gold-4">Hextech</h1>
+        <div>Theorycraft your next build</div>
+        <div className="">
+          <Button color="primary" variant="ghost">
+            Start Build
+          </Button>
+        </div>
+      </div>
+      <div>
+        <Image
+          width={300}
+          alt="Ornn Passive Icon"
+          src="/images/OrnnPassive.png"
+        />
+      </div>
     </div>
   );
 }

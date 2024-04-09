@@ -32,13 +32,15 @@ export default function HextechNavbar() {
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
         />
-        <NavbarBrand>
-          <Image
-            width={32}
-            alt="Hextech logo"
-            src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/hextech-images/chest.png"
-          />
-          <p className="font-bold text-inherit">Hextech</p>
+        <NavbarBrand className="text-grey-1">
+          <Link href="/" className="text-grey-1">
+            <Image
+              width={32}
+              alt="Hextech logo"
+              src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/hextech-images/chest.png"
+            />
+            <p className="font-bold text-inherit">Hextech</p>
+          </Link>
         </NavbarBrand>
       </NavbarContent>
 
@@ -49,6 +51,7 @@ export default function HextechNavbar() {
           </Link>
         </NavbarItem>
         {/* Potential Testing */}
+        {/* 
         <NavbarItem>
           <Link
             color="foreground"
@@ -57,7 +60,8 @@ export default function HextechNavbar() {
           >
             testing-ChampSelect
           </Link>
-        </NavbarItem>
+        </NavbarItem> 
+        */}
       </NavbarContent>
 
       <NavbarMenu>

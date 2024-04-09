@@ -47,11 +47,14 @@ const spiegel = localFont({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${spiegel.variable} ${beaufort.variable} `}>
+    <html
+      lang="en"
+      className={`${spiegel.variable} ${beaufort.variable} bg-gradient-to-r from-grey-cool to-hextech-black`}
+    >
       <body>
         <Providers>
           <HextechNavbar />
-          <main>{children}</main>
+          <main className="text-grey-1">{children}</main>
         </Providers>
       </body>
     </html>
