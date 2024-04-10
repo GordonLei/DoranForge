@@ -1,8 +1,17 @@
+/*
+
+This is the champion select cards where users press on the card to redirect to the specific champion page
+
+*/
+
 "use client";
 
+//  imports
+//    npm packages
 import Link from "next/link";
 import Image from "next/image";
 
+//  component
 export default function ChampionSelectCard({
   id,
   name,

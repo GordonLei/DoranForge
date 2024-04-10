@@ -1,8 +1,8 @@
-"use client";
-
 /*
 This component is an item that can be hovered to show its relevant information
 */
+
+"use client";
 
 //  libraries
 //    npm packages

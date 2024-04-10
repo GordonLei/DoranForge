@@ -1,13 +1,18 @@
-// app/layout.tsx
-import localFont from "next/font/local";
-import HextechNavbar from "@/components/ui/hextechNavbar";
-import Providers from "./providers";
+/*
+This is the base layout that all pages will use
+*/
 
-//
+//  imports
+//    components (this needs to be ahead in the front of the NPM packages for this file)
+import HextechNavbar from "@/components/ui/hextechNavbar";
+//    npm packages
+import localFont from "next/font/local";
+import Providers from "./providers";
 
 // These styles apply to every route in the application
 import "./globals.css";
 
+//  fonts
 const beaufort = localFont({
   src: [
     {
@@ -45,6 +50,7 @@ const spiegel = localFont({
   variable: "--font-spiegel",
 });
 
+//  component
 export default function RootLayout({ children }) {
   return (
     <html

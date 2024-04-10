@@ -1,8 +1,8 @@
-"use client";
-
 /*
 This component that shows the user's inventory and opens up the shop menu
 */
+
+"use client";
 
 //  libraries
 //    npm packages

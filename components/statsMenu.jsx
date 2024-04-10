@@ -1,8 +1,10 @@
-"use client";
-
 /*
+
 This is the menu that displays the Stat information 
+
 */
+
+"use client";
 
 //  imports
 //    npm packages

@@ -1,5 +1,13 @@
+/*
+
+This is the navBar
+
+*/
+
 "use client";
 
+//  imports
+//    npm packages
 import React from "react";
 import {
   Image,
@@ -13,9 +21,11 @@ import {
   Link,
 } from "@nextui-org/react";
 
+//  This is the component
 export default function HextechNavbar() {
+  //  states
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
+  //  default values
   const menuItems = [
     { url: "champions", name: "Champions" },
     { url: "testing/champSelect", name: "test-ChampSelect" },

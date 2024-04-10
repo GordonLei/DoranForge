@@ -1,9 +1,13 @@
 "use client";
 
+//  imports
+//    npm packages
 import { useRef } from "react";
 import { Provider } from "react-redux";
+//    library functions
 import { makeStore } from "../lib/store";
 
+//  Redux provider
 export default function ReduxProvider({ children }) {
   const storeRef = useRef();
   if (!storeRef.current) {

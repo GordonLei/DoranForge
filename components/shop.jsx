@@ -1,10 +1,10 @@
-"use client";
-
 /*
 
 This component is that shop pop up where users can purchase and sell items
 
 */
+
+"use client";
 
 //  imports
 //    npm packages

@@ -1,10 +1,21 @@
+/*
+
+This are ghost buttons (buttons that are transparent background until hover/press)
+
+*/
+
 "use client";
 
+//  imports
+//    npm packages
 import { Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 
+//  The actual component
 function GhostButton({ propStyles }) {
+  //  call the router in order to redirect
   const router = useRouter();
+  //  default button styles that will be replaced by the prop
   const buttonStyles = {
     "border-type": "border-solid",
     "border-length": "border-2",

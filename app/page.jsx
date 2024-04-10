@@ -1,6 +1,14 @@
+/*
+This is the home page 
+*/
+
+//  imports
+//    npm packages
 import { Image } from "@nextui-org/react";
+//    components
 import GhostButton from "@/components/ui/ghostButton";
 
+//  page layout
 export default function HomePage() {
   return (
     <div className="flex flex-row justify-center items-center space-x-64 h-[calc(100vh-88px)]">
