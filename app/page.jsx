@@ -1,4 +1,5 @@
-import { Button, Image } from "@nextui-org/react";
+import { Image } from "@nextui-org/react";
+import GhostButton from "@/components/ui/ghostButton";
 
 export default function HomePage() {
   return (
@@ -7,9 +8,9 @@ export default function HomePage() {
         <h1 className="text-gold-4">Hextech</h1>
         <div>Theorycraft your next build</div>
         <div className="">
-          <Button color="primary" variant="ghost">
-            Start Build
-          </Button>
+          <GhostButton
+            propStyles={{ text: "Start Build", onPressRedirect: "/champions" }}
+          />
         </div>
       </div>
       <div>
