@@ -10,6 +10,7 @@ This is the menu  that displays the Skills information
 //    npm packages
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { Image, Select, SelectItem } from "@nextui-org/react";
 //    helper functions
 import { objectMapArray } from "@/helper/misc";
 import { parse } from "@/helper/lolstaticdata";
@@ -36,10 +37,15 @@ function SkillsMenu({ name, abilities, baseStats }) {
 
   //
   function handleSkillAllocation(key, numPoints) {
-    //  console.log(numPoints - 1);
+    //  I do not know why SelectItem uses the key as its value
+    //    need to parse this
+    //  If numPoints is a num, return it, else do the special parse
+
     setPointAllocation({
       ...pointAllocation,
-      [key]: numPoints,
+      [key]: Number.isNaN(parseFloat(numPoints))
+        ? numPoints.split("_")[2]
+        : numPoints,
     });
   }
   //  update the abilities text when pointAllocation is updated
@@ -51,29 +57,41 @@ function SkillsMenu({ name, abilities, baseStats }) {
   }, [name, abilities, baseStats, pointAllocation, currentStats]);
 
   return (
-    <div>
+    <div className="m-16">
       {objectMapArray(currentAbilities, (key, value) => (
-        <div key={`${key}_skill`} className="m-4 border-t-2">
+        <div key={`${key}_skill`} className="m-4 p-8 border-t-2">
           <div key={`${key}_name`}>
-            <h1>{`${key === "P" ? "Passive" : key}: ${value.name}`}</h1>
+            <div className="flex flex-row space-x-8">
+              <Image width={64} alt="Ornn Passive Icon" src={`${value.icon}`} />
+              <h1 className="text-gold-2">{`${key === "P" ? "Passive" : key}: ${value.name}`}</h1>
+            </div>
+
             {key !== "P" && (
-              <select
+              <Select
                 name="level"
                 id="level"
                 key={`${key}_select`}
+                className="my-8 max-w-32"
+                label="Skill Level"
+                placeholder="Select a skill level"
+                defaultSelectedKeys={[`${key}_level_1`]}
                 onChange={(event) =>
                   handleSkillAllocation(key, event.target.value)
                 }
               >
                 {Array.from(Array(key === "R" ? 3 : 5).keys()).map((level) => (
-                  <option key={`${key}_level_${level + 1}`} value={level + 1}>
+                  <SelectItem
+                    key={`${key}_level_${level + 1}`}
+                    value={level + 1}
+                    textValue={level + 1}
+                  >
                     {level + 1}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
+              </Select>
             )}
           </div>
-          <div key={`${key}_tooltip_parent`}>
+          <div key={`${key}_tooltip_parent`} className="my-4">
             {/* console.log(key, each[0].props.children[1].length, index) */}
             {value.tooltip.map((each) => (
               <div

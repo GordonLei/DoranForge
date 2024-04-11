@@ -23,3 +23,4 @@ TO DOS:
 - Item hit effect and tip have to add symbols
 - Need to round to 2 decimals for Item numerized stats
 - Replace logo image in navbar
+- Some words need to be checked when adding color to text to account for suffixes (ex. Syndra W uses "slowed" but only "slow" is colored)

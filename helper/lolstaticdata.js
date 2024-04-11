@@ -179,6 +179,7 @@ const numerize = (
       //  remove percent sign
       baseArray[0] = baseArray[0].replace("%", "");
       //  If this value is not a number, an error occured
+
       if (Number.isNaN(parseFloat(baseArray[0]))) {
         console.log("ERROR IN LOLSTATDATA NUMERIZE");
         return -1;
@@ -364,13 +365,19 @@ const prepStylize = (
       .flat(); //  now flatten the outputs
     return { tooltip };
   });
-  //  now add the names
+  //  now add the names and icons
 
   prepped.P.name = skillNames.P.join(" ");
   prepped.Q.name = skillNames.Q.join(" ");
   prepped.W.name = skillNames.W.join(" ");
   prepped.E.name = skillNames.E.join(" ");
   prepped.R.name = skillNames.R.join(" ");
+
+  prepped.P.icon = abilitiesObject.P[0].icon;
+  prepped.Q.icon = abilitiesObject.Q[0].icon;
+  prepped.W.icon = abilitiesObject.W[0].icon;
+  prepped.E.icon = abilitiesObject.E[0].icon;
+  prepped.R.icon = abilitiesObject.R[0].icon;
 
   return prepped;
 };

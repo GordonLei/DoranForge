@@ -37,7 +37,7 @@ function StatsMenu({ championData, baseStats, perLevelStats }) {
   }, [baseStats, dispatch]);
   //
   return (
-    <div className="flex flex-row  place-content-center">
+    <div className="flex flex-row  place-content-center m-16">
       {/* This section is the header */}
       <div>
         {/* Name and title */}
