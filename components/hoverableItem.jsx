@@ -72,18 +72,28 @@ export default function HoverableItem({
           {/* Stats */}
           <div className="flex flex-col">
             {parsedItemData.statArray.map((eachStat, index) => (
-              <div key={`${index}-${eachStat.name}`}>{eachStat.text}</div>
+              <div key={`${index}-${eachStat.name}`}>
+                {console.log("ESN", eachStat.name)}
+                {eachStat.text}
+              </div>
             ))}
           </div>
           {/* Active / Passives */}
           <div className="flex flex-col">
             {/* Actives */}
+            {console.log("EACH ACTIVE: ", parsedItemData.active)}
             {parsedItemData.active.map((eachActive, index) => (
-              <div key={`${index}-${eachActive.name}`}>{eachActive.text}</div>
+              <div key={`${index}-${eachActive.name}`}>
+                {console.log("EAN", eachActive.name)}
+                {eachActive.text}
+              </div>
             ))}
             {/* Passives */}
             {parsedItemData.passives.map((eachPassive, index) => (
-              <div key={`${index}-${eachPassive.name}`}>{eachPassive.text}</div>
+              <div key={`${index}-${eachPassive.name}`}>
+                {console.log("EPN", eachPassive.name)}
+                {eachPassive.text}
+              </div>
             ))}
           </div>
         </div>

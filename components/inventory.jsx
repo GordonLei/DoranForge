@@ -60,7 +60,7 @@ export default function Inventory() {
   return the component
   */
   return (
-    <div>
+    <div className="">
       {/* The Shop menu component */}
       <Shop
         showShop={showShop}
@@ -68,7 +68,7 @@ export default function Inventory() {
         pressedPurchase={pressedPurchase}
       />
       {/* The actual inventory component */}
-      <div className="sticky top-16  h-20  content-center">
+      <div className="sticky top-16  h-20  content-center z-[35]">
         {/* Inventory Section. */}
         {/*   This displays the items in the inventory bar shown on the right */}
         {currentInventory.map((item) => (
@@ -83,10 +83,10 @@ export default function Inventory() {
         <button
           id="openShop"
           type="button"
-          className="relative h-[64px] w-[64px]"
+          className="relative h-[64px] w-[64px] mr-4"
         >
           <Image
-            src="/images/temp_openInventory.png"
+            src="/images/nav-icon-store.svg"
             alt="me"
             fill
             sizes="64px"

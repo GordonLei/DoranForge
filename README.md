@@ -24,3 +24,4 @@ TO DOS:
 - Need to round to 2 decimals for Item numerized stats
 - Replace logo image in navbar
 - Some words need to be checked when adding color to text to account for suffixes (ex. Syndra W uses "slowed" but only "slow" is colored)
+- Occassional bug where changing Chmapion Level focuses / forces a jump toward the Select and randomly picks a value depending on where your cursor is on the Select Menu. (this is jarring to see happen)
