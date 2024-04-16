@@ -68,17 +68,10 @@ export default function Inventory() {
         pressedPurchase={pressedPurchase}
       />
       {/* The actual inventory component */}
-      <div className="sticky top-16  h-20  content-center z-[35]">
+      {/*  top-16  h-20  content-center */}
+      <div className="sticky  top-[25vh] z-[35]">
         {/* Inventory Section. */}
-        {/*   This displays the items in the inventory bar shown on the right */}
-        {currentInventory.map((item) => (
-          /* Map all of the item icons */
-          <HoverableItem
-            key={`${item.name}-${item.PP_id}-HI`}
-            itemData={item}
-            itemPPId={item.PP_id}
-          />
-        ))}
+
         {/* Button to open the shop menu */}
         <button
           id="openShop"
@@ -94,6 +87,15 @@ export default function Inventory() {
             ref={buttonOpenShop}
           />
         </button>
+        {/*   This displays the items in the inventory bar shown on the right */}
+        {currentInventory.map((item) => (
+          /* Map all of the item icons */
+          <HoverableItem
+            key={`${item.name}-${item.PP_id}-HI`}
+            itemData={item}
+            itemPPId={item.PP_id}
+          />
+        ))}
       </div>
     </div>
   );

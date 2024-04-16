@@ -4,13 +4,14 @@ TO DOS:
 
 # Working on
 
-- Inventory.jsx --> tooltip on hover item
-- Shop.jsx --> Make item MATH information show up
+- Making page look more visually pleasing
 
 # MAJOR PROBLEMS
 
 - If skills need target max health, add it to the skill description calculation (ex. 60 + 4% max hp)
 - Fix "mapped" component keys (problem lies in having purchased multiple of the same item. need to differentiate same items)
+- Need to add caclulations for attack speed
+- Shop needs to follow HoverableItem where it parses the calculations in item active/passives
 
 # MINOR PROBLEMS
 
@@ -25,3 +26,5 @@ TO DOS:
 - Replace logo image in navbar
 - Some words need to be checked when adding color to text to account for suffixes (ex. Syndra W uses "slowed" but only "slow" is colored)
 - Occassional bug where changing Chmapion Level focuses / forces a jump toward the Select and randomly picks a value depending on where your cursor is on the Select Menu. (this is jarring to see happen)
+- Pressing the Shop button adds a horizontal scrollbar (need to remove this)
+- Need a better way to add a blank div under the Shop / row of items to give it a margin/padding. (look for the comment that reads "TEMPORARY WAY TO ADD A "FOOTER-ESQUE" thing to the shop")

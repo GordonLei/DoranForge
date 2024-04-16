@@ -26,8 +26,8 @@ import {
   validateInventory,
 } from "../helper/lolItem";
 import { objectMapArray } from "../helper/misc";
-
-//  react-redux
+//  components
+import GhostButtonGeneric from "./ui/ghostButtonGeneric";
 
 // Write a fetcher function to wrap the native fetch function and return the result of a call to url in json format
 const fetcher = (url) =>
@@ -79,7 +79,7 @@ export default function Shop({
   };
   //  handle buying the selected item
   const handlePurchase = (event, itemId) => {
-    event.stopPropagation();
+    //  event.stopPropagation();
     const item = parsedItemData[itemId];
     if (validateInventory(currentInventory, item)) {
       const clone = { ...item, PP_id: pressedPurchase };
@@ -92,7 +92,7 @@ export default function Shop({
   };
   //  handle selling the selected item
   const handleSell = (event, itemId) => {
-    event.stopPropagation();
+    //  event.stopPropagation();
     const item = parsedItemData[itemId];
     if (checkInInventory(currentInventory, item)) {
       dispatch(removeItemById(itemId));
@@ -124,11 +124,11 @@ export default function Shop({
   // Handle the ready state and display the result contained in the data object mapped to the structure of the json file
   if (showShop) {
     return (
-      <div className="w-screen flex flex-row overscroll-y-auto fixed left-0 bg-gradient-to-r from-blue-5 to-blue-7 z-30">
+      <div className="w-full flex flex-row overscroll-y-auto fixed left-0 bg-gradient-to-r from-blue-5 to-blue-7 z-30">
         {/* This is the shop window */}
         {/* Left side panel that shows all the items */}
-        <div className="w-1/2 max-h-screen overflow-y-auto ">
-          <div className="sticky h-screen  grid grid-cols-5 gap-2">
+        <div className="px-4 py-16 w-1/2 max-h-screen overflow-y-auto overflow-x-hidden ">
+          <div className="sticky h-full grid grid-cols-5 place-items-center gap-2">
             {parsedItemData &&
               Object.values(parsedItemData).map((item) => {
                 if (!item.shop.purchasable) {
@@ -178,10 +178,12 @@ export default function Shop({
                   </div>
                 );
               })}
+            {/* TEMPORARY WAY TO ADD A "FOOTER-ESQUE" thing to the shop */}
+            <div className="mb-64" />
           </div>
         </div>
         {/* Right side panel that shows selected item description */}
-        <div className="w-1/2 text-grey-1">
+        <div className="p-16 w-1/2 text-grey-1">
           {/* If an item is selected, then display it */}
           {currItem < 0 || (
             <div className="flex flex-col">
@@ -205,48 +207,86 @@ export default function Shop({
                   sizes="64px"
                 />
               </div>
-              <div>{getItemInfo(currItem, "name")}</div>
-              <div>{getItemInfo(currItem, "simpleDescription")}</div>
+              <h3 className="text-gold-2">{getItemInfo(currItem, "name")}</h3>
+              <div className="mb-4">
+                {getItemInfo(currItem, "simpleDescription")}
+              </div>
               {/* Show the stats obtainable from buying the item */}
-              {objectMapArray(
-                extractItemStatFromDict(getItemInfo(currItem, "stats")),
-                (statName, value) => (
-                  <div key={`${statName}`}>{`${value} ${statName}`}</div>
-                )
-              )}
+              <div className="mb-4">
+                {objectMapArray(
+                  extractItemStatFromDict(getItemInfo(currItem, "stats")),
+                  (statName, value) => {
+                    //  do some parsing
+                    let currStatName = statName;
+                    if (currStatName === "criticalStrikeChance") {
+                      currStatName = "crit";
+                    }
+                    return (
+                      <div
+                        key={`${currStatName}`}
+                        className="flex flex-row space-x-2"
+                      >
+                        <div className="w-5 h-5 relative">
+                          <Image
+                            src={`/images/${currStatName}.png`}
+                            alt={`/images/${currStatName}.png`}
+                            layout="fill"
+                            key={`/images/${currStatName}.png`}
+                          />
+                        </div>
+                        <div>
+                          <span className="text-gold-1">{value}</span>{" "}
+                          {statName}
+                          {/* `${value} ${statName}` */}
+                        </div>
+                      </div>
+                    );
+                  }
+                )}
+              </div>
               {/* Map through all the item passives */}
-              {getItemInfo(currItem, "passives").map((currentPassive) => (
-                /*
+              <div className="mb-4">
+                {getItemInfo(currItem, "passives").map((currentPassive) => (
+                  /*
                   Need a part to show Mythic Passives stats
                   */
-                <div key={`${currentPassive.name}`}>
-                  {currentPassive.name}:{currentPassive.effects}
-                </div>
-              ))}
+                  <div key={`${currentPassive.name}`}>
+                    <span className="text-gold-1">{currentPassive.name}</span>:{" "}
+                    {currentPassive.effects}
+                  </div>
+                ))}
+              </div>
               {/* Map through all the item actives */}
-              {getItemInfo(currItem, "active").map((currentActive) => (
-                <div key={`${currentActive.name}`}>
-                  {currentActive.name}:{currentActive.effects}
-                </div>
-              ))}
-              {/* Button to buy the item */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  handlePurchase(e, getItemInfo(currItem, "id"));
-                }}
-              >
-                Purchase
-              </button>
-              {/* Button to sell the item  */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  handleSell(e, getItemInfo(currItem, "id"));
-                }}
-              >
-                Sell
-              </button>
+              <div className="mb-4">
+                {getItemInfo(currItem, "active").map((currentActive) => (
+                  <div key={`${currentActive.name}`}>
+                    <span className="text-gold-4">{currentActive.name}</span>:{" "}
+                    {currentActive.effects}
+                  </div>
+                ))}
+              </div>
+              {/* Button Div */}
+              <div className="my-8 flex flex-col space-y-8">
+                {/* Button to buy the item */}
+                <GhostButtonGeneric
+                  propStyles={{
+                    text: "Purchase",
+                    onPressFunc: (e) => {
+                      handlePurchase(e, getItemInfo(currItem, "id"));
+                    },
+                  }}
+                />
+                {/* Button to sell the item  */}
+                {/* Button to buy the item */}
+                <GhostButtonGeneric
+                  propStyles={{
+                    text: "Sell",
+                    onPressFunc: (e) => {
+                      handleSell(e, getItemInfo(currItem, "id"));
+                    },
+                  }}
+                />
+              </div>
             </div>
           )}
         </div>
