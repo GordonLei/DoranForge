@@ -34,6 +34,25 @@ export const extractItemStatFromDictAsTuple = (statDict) => {
   return extractedStatDict;
 };
 
+//  same thing as extractItemStatFromDict but return the result as an object
+export const extractItemStatFromDictAsDict = (statDict) => {
+  const extractedStatDict = {};
+  /* eslint-disable-next-line no-restricted-syntax */
+  for (const [stat, statValueDict] of Object.entries(statDict)) {
+    /* eslint-disable-next-line no-restricted-syntax */
+    for (const [progressionType, value] of Object.entries(statValueDict)) {
+      if (value > 0) {
+        extractedStatDict[stat] = {
+          text: `${value} ${progressionType}`,
+          value,
+          progressionType,
+        };
+      }
+    }
+  }
+  return extractedStatDict;
+};
+
 //  check if the item is currently  in the inventory
 export const checkInInventory = (currentInventory, item) => {
   const itemID = item.id;
@@ -78,16 +97,22 @@ export const reduxValidateInventory = (state, newItem) => {
 //  stylize the stats of an item
 export const stylizeStats = (statName, statValue) => {
   console.log("SS", statName, statValue);
+  const value = statValue.split(" ")[0];
+  const progressionType = statValue.split(" ")[1];
   switch (statName) {
     case "attackDamage":
       return {
         name: statName,
         text: `${statValue} ${statName}`,
+        value,
+        progressionType,
       };
     default:
       return {
         name: statName,
         text: `${statValue} ${statName}`,
+        value,
+        progressionType,
       };
   }
 };
@@ -218,10 +243,10 @@ const numerize = (formattedPassives, currentStats) => {
       let text;
       switch (eachEffect.format) {
         case "AD":
-          text = `${
-            (parseFloat(eachEffect.text.slice(0, -1)) / 100.0).toFixed(2) *
+          text = `${(
+            (parseFloat(eachEffect.text.slice(0, -1)) / 100.0) *
             currentStats.attackDamage
-          } or (${eachEffect.text} AD)`;
+          ).toFixed(2)} or (${eachEffect.text} AD)`;
           break;
         //  idk what to do with attack effect yet
         case "attack effect":
@@ -297,7 +322,9 @@ const colorizeAndFinalize = (numerizedPassives) => {
         //  name
         case "name": {
           return (
-            <div className="font-bold">
+            <div
+              className={`font-bold ${eachEffect.isActive ? "text-gold-4" : "text-gold-1"}`}
+            >
               {eachEffect.isActive && "Active - "}
               {eachEffect.text}
             </div>
@@ -356,6 +383,13 @@ const parseItemPA = (passives, active, currentStats) => {
 //    This will return an object with every information you need in an object to display information
 export const parseItemData = (championName, currentStats, itemData) => {
   const masterRes = {};
+  //  get name and ID
+  masterRes.name = itemData.name;
+  masterRes.id = itemData.id;
+  masterRes.requiredAlly = itemData.requiredAlly;
+  masterRes.icon = itemData.icon;
+  masterRes.simpleDescription = itemData.simpleDescription;
+  masterRes.totalPrice = itemData.shop.prices.total;
   //  get the item stat information
   const parsedItemStats = extractItemStatFromDict(itemData.stats);
   const statArray = Object.entries(parsedItemStats).map(([key, value]) =>

@@ -12,6 +12,8 @@ TO DOS:
 - Fix "mapped" component keys (problem lies in having purchased multiple of the same item. need to differentiate same items)
 - Need to add caclulations for attack speed
 - Shop needs to follow HoverableItem where it parses the calculations in item active/passives
+- Some items cannot be bought due to problems in interpreting differences for ranged/melee stats for HoverableItem
+- Some items (ex. Dark Seal) have an infinite loop when passive/active is parsed through HoverableItem
 
 # MINOR PROBLEMS
 

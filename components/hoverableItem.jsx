@@ -10,7 +10,7 @@ import { Divider, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 //    helper folder functions
-import { extractItemStatFromDict, parseItemData } from "@/helper/lolItem";
+import { parseItemData } from "@/helper/lolItem";
 //    lib folder functions
 import { statsSelector } from "@/lib/storeFeatures/stats/statsSlice";
 //    components
@@ -30,11 +30,12 @@ export default function HoverableItem({
   */
   return (
     <Tooltip
+      className="bg-hextech-black text-grey-1 border-2 border-gold-4"
       content={
-        <div className="bg-white flex flex-col">
-          <div>
+        <div className="flex flex-col p-2">
+          <div className="">
             {/* Header */}
-            <div className="flex flex-row">
+            <div className="flex flex-row space-x-4">
               {/* Div for image */}
               <div
                 className="relative h-[64px] w-[64px]"
@@ -63,23 +64,51 @@ export default function HoverableItem({
               </div>
               {/* Name of item and gold cost */}
               <div className="flex flex-col">
-                <div>{itemData.name}</div>
-                <div>{itemData.shop.prices.total} </div>
+                <h4 className="text-gold-4">{itemData.name}</h4>
+                <div className="text-gold-2 flex flex-row space-x-2">
+                  <div className="w-5 h-5 relative">
+                    <Image
+                      src={`/images/gold.png`}
+                      alt={`/images/gold.png`}
+                      layout="fill"
+                      key={`/images/gold.png`}
+                    />
+                  </div>
+                  <div>{itemData.shop.prices.total} </div>
+                </div>
               </div>
             </div>
           </div>
-          <Divider className="my-4" />
+          <Divider className="my-4 bg-gold-4" />
           {/* Stats */}
-          <div className="flex flex-col">
-            {parsedItemData.statArray.map((eachStat, index) => (
-              <div key={`${index}-${eachStat.name}`}>
-                {console.log("ESN", eachStat.name)}
-                {eachStat.text}
-              </div>
-            ))}
+          <div className="flex flex-col mb-4">
+            {parsedItemData.statArray.map((eachStat, index) => {
+              //  do some parsing
+              let currStatName = eachStat.name;
+              if (currStatName === "criticalStrikeChance") {
+                currStatName = "crit";
+              }
+              return (
+                <div
+                  key={`${index}-${currStatName}`}
+                  className="flex flex-row space-x-2"
+                >
+                  <div className="w-5 h-5 relative">
+                    <Image
+                      src={`/images/${currStatName}.png`}
+                      alt={`/images/${currStatName}.png`}
+                      layout="fill"
+                      key={`/images/${currStatName}.png`}
+                    />
+                  </div>
+                  <span className="text-gold-1">{eachStat.value}</span>
+                  <span> {eachStat.name}</span>
+                </div>
+              );
+            })}
           </div>
           {/* Active / Passives */}
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-4">
             {/* Actives */}
             {console.log("EACH ACTIVE: ", parsedItemData.active)}
             {parsedItemData.active.map((eachActive, index) => (
@@ -91,7 +120,7 @@ export default function HoverableItem({
             {/* Passives */}
             {parsedItemData.passives.map((eachPassive, index) => (
               <div key={`${index}-${eachPassive.name}`}>
-                {console.log("EPN", eachPassive.name)}
+                {console.log("EPN", eachPassive.name, eachPassive.text)}
                 {eachPassive.text}
               </div>
             ))}

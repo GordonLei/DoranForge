@@ -18,12 +18,17 @@ import {
   removeItemById,
   inventorySelector,
 } from "@/lib/storeFeatures/inventory/inventorySlice";
-import { addStats, removeStats } from "@/lib/storeFeatures/stats/statsSlice";
+import {
+  statsSelector,
+  addStats,
+  removeStats,
+} from "@/lib/storeFeatures/stats/statsSlice";
+
 //  helper functions
 import {
-  extractItemStatFromDict,
   checkInInventory,
   validateInventory,
+  parseItemData,
 } from "../helper/lolItem";
 import { objectMapArray } from "../helper/misc";
 //  components
@@ -48,8 +53,10 @@ export default function Shop({
   //  react-redux to use inventory slice
   const dispatch = useDispatch();
   const currentInventory = useSelector(inventorySelector);
+  const currentStats = useSelector(statsSelector);
   //  react  states
-  const [currItem, setCurrItem] = useState(-1);
+  const [currItemId, setcurrItemId] = useState(-1);
+  const [currItem, setcurrItem] = useState({});
   const [parsedItemData, setParsedItemData] = useState({});
   /*
   Functions
@@ -75,7 +82,12 @@ export default function Shop({
   });
   //  handle pressing the item and setting the current selected item to that
   const handleClick = (itemId) => {
-    setCurrItem(itemId);
+    setcurrItemId(itemId);
+    setcurrItem(parseItemData("", currentStats, parsedItemData[itemId]));
+    console.log(
+      "PARSED DATA:",
+      parseItemData("", currentStats, parsedItemData[itemId])
+    );
   };
   //  handle buying the selected item
   const handlePurchase = (event, itemId) => {
@@ -185,84 +197,83 @@ export default function Shop({
         {/* Right side panel that shows selected item description */}
         <div className="p-16 w-1/2 text-grey-1">
           {/* If an item is selected, then display it */}
-          {currItem < 0 || (
+
+          {currItemId < 0 || (
             <div className="flex flex-col">
               <div className="relative h-[64px] w-[64px]">
-                {getItemInfo(currItem, "requiredAlly") !== "Ornn" || (
+                {currItem.requiredAlly !== "Ornn" || (
                   <Image
                     src="https://raw.communitydragon.org/13.19/game/assets/items/itemmodifiers/bordertreatmentornn.png"
-                    alt={`${getItemInfo(currItem, "name")} ornn border`}
-                    key={`${currItem} ornn border`}
+                    alt={`${currItem.name} ornn border`}
+                    key={`${currItem.name} ornn border`}
                     className="z-50 absolute"
                     fill
                     sizes="64px"
                   />
                 )}
                 <Image
-                  src={getItemInfo(currItem, "icon")}
-                  alt={`${getItemInfo(currItem, "name")} png`}
-                  key={`item_${currItem}`}
+                  src={currItem.icon}
+                  alt={`${currItem.name} png`}
+                  key={`item_${currItem.name}`}
                   className="z-40"
                   fill
                   sizes="64px"
                 />
               </div>
-              <h3 className="text-gold-2">{getItemInfo(currItem, "name")}</h3>
-              <div className="mb-4">
-                {getItemInfo(currItem, "simpleDescription")}
+              <h3 className="text-gold-2">{currItem.name}</h3>
+              <div className="flex flex-row">
+                <div className="w-5 h-5 relative">
+                  <Image
+                    src="/images/gold.png"
+                    alt="/images/gold.png"
+                    layout="fill"
+                    key="/images/gold.png"
+                  />
+                </div>
+                <div>{currItem.totalPrice} </div>
               </div>
+
+              <div className="mb-4">{currItem.simpleDescription}</div>
               {/* Show the stats obtainable from buying the item */}
               <div className="mb-4">
-                {objectMapArray(
-                  extractItemStatFromDict(getItemInfo(currItem, "stats")),
-                  (statName, value) => {
-                    //  do some parsing
-                    let currStatName = statName;
-                    if (currStatName === "criticalStrikeChance") {
-                      currStatName = "crit";
-                    }
-                    return (
-                      <div
-                        key={`${currStatName}`}
-                        className="flex flex-row space-x-2"
-                      >
-                        <div className="w-5 h-5 relative">
-                          <Image
-                            src={`/images/${currStatName}.png`}
-                            alt={`/images/${currStatName}.png`}
-                            layout="fill"
-                            key={`/images/${currStatName}.png`}
-                          />
-                        </div>
-                        <div>
-                          <span className="text-gold-1">{value}</span>{" "}
-                          {statName}
-                          {/* `${value} ${statName}` */}
-                        </div>
-                      </div>
-                    );
+                {currItem.statArray.map((eachStat, index) => {
+                  //  do some parsing
+                  let currStatName = eachStat.name;
+                  if (currStatName === "criticalStrikeChance") {
+                    currStatName = "crit";
                   }
-                )}
+                  return (
+                    <div
+                      key={`${index}-${currStatName}`}
+                      className="flex flex-row space-x-2"
+                    >
+                      <div className="w-5 h-5 relative">
+                        <Image
+                          src={`/images/${currStatName}.png`}
+                          alt={`/images/${currStatName}.png`}
+                          layout="fill"
+                          key={`/images/${currStatName}.png`}
+                        />
+                      </div>
+                      <span className="text-gold-1">{eachStat.value}</span>
+                      <span> {eachStat.name}</span>
+                    </div>
+                  );
+                })}
               </div>
               {/* Map through all the item passives */}
               <div className="mb-4">
-                {getItemInfo(currItem, "passives").map((currentPassive) => (
-                  /*
-                  Need a part to show Mythic Passives stats
-                  */
+                {console.log("CIV@", currItem)}
+                {currItem.passives.map((currentPassive) => (
                   <div key={`${currentPassive.name}`}>
-                    <span className="text-gold-1">{currentPassive.name}</span>:{" "}
-                    {currentPassive.effects}
+                    {currentPassive.text}
                   </div>
                 ))}
               </div>
               {/* Map through all the item actives */}
               <div className="mb-4">
-                {getItemInfo(currItem, "active").map((currentActive) => (
-                  <div key={`${currentActive.name}`}>
-                    <span className="text-gold-4">{currentActive.name}</span>:{" "}
-                    {currentActive.effects}
-                  </div>
+                {currItem.active.map((currentActive) => (
+                  <div key={`${currentActive.name}`}>{currentActive.text}</div>
                 ))}
               </div>
               {/* Button Div */}
@@ -272,7 +283,7 @@ export default function Shop({
                   propStyles={{
                     text: "Purchase",
                     onPressFunc: (e) => {
-                      handlePurchase(e, getItemInfo(currItem, "id"));
+                      handlePurchase(e, currItem.id);
                     },
                   }}
                 />
@@ -282,7 +293,7 @@ export default function Shop({
                   propStyles={{
                     text: "Sell",
                     onPressFunc: (e) => {
-                      handleSell(e, getItemInfo(currItem, "id"));
+                      handleSell(e, currItem.id);
                     },
                   }}
                 />
