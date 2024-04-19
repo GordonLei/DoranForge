@@ -19,6 +19,7 @@ module.exports = {
     "text-green-700",
     "text-lime-500",
     "text-red-800 ",
+    "text-orange-700",
     "text-yellow-500" /*  Hextech Magic */,
     "blue-1",
     "blue-2",

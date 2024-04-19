@@ -84,10 +84,12 @@ export default function Shop({
   const handleClick = (itemId) => {
     setcurrItemId(itemId);
     setcurrItem(parseItemData("", currentStats, parsedItemData[itemId]));
+    /*
     console.log(
       "PARSED DATA:",
       parseItemData("", currentStats, parsedItemData[itemId])
     );
+    */
   };
   //  handle buying the selected item
   const handlePurchase = (event, itemId) => {
@@ -262,14 +264,10 @@ export default function Shop({
                 })}
               </div>
               {/* Map through all the item passives */}
-              <div className="mb-4">
-                {console.log(currItem.passives, currItem.passives.length)}
+              <div className="mb-4" key="passives-menu-shop-view">
                 {currItem.passives.map((currentPassive, index) => (
                   <div key={`${currentPassive.name}-shop-view`}>
-                    {console.log(
-                      "WHAT IS THIS: ",
-                      `${currentPassive.name}-${index}`
-                    )}
+                    {console.log(currentPassive.text)}
                     {currentPassive.text}
                   </div>
                 ))}

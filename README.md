@@ -5,7 +5,6 @@ TO DOS:
 # Working on
 
 - If skills need target max health, add it to the skill description calculation (ex. 60 + 4% max hp)
-- Some items (ex. Dark Seal) have an infinite loop when passive/active is parsed through HoverableItem
 - Item hit effect and tip have to add symbols
 
 # MAJOR PROBLEMS

@@ -157,12 +157,6 @@ const findStartEndIndex = (effectString) => {
     curlyStartIndex = effectString.indexOf("{{");
     const squareEndIndex = effectString.indexOf("]]");
     const curlyEndIndex = effectString.indexOf("}}");
-    console.log(
-      squareStartIndex,
-      squareEndIndex,
-      curlyStartIndex,
-      curlyEndIndex
-    );
     const indexes = [
       squareStartIndex,
       squareEndIndex,
@@ -188,9 +182,6 @@ const findStartEndIndex = (effectString) => {
         console.log(effectString);
     }
     endIndex += minIndex + 2;
-    console.log(counter);
-    console.log(effectString.slice(minIndex + 2));
-    console.log("--------------------");
     effectString = effectString.slice(minIndex + 2);
   }
   return [startIndex, endIndex - 2];
@@ -216,88 +207,94 @@ const prepStylize = (currentPassive, isActive = false) => {
     });
     //  NOW WE CAN RETRIEVE THE SPECIAL SYNTAX
     const specialSyntax = effects.slice(startIndex, endIndex);
+    console.log(
+      "specialSyntax",
+      specialSyntax,
+      specialSyntax.slice(0, 2) === "[["
+    );
     if (specialSyntax.slice(0, 2) === "[[") {
       //  remove the special character [[]]
       const textItem = specialSyntax.slice(2);
       passiveArray.push({ format: "attack effect", text: textItem });
+    } else {
+      //  only other option should be "{"
+      //  remove the special character {{}}
+      const textItem = specialSyntax.slice(2);
+      const modifiers = [
+        textItem.slice(0, textItem.indexOf("|")),
+        textItem.slice(textItem.indexOf("|") + 1),
+      ];
+
+      switch (modifiers[0]) {
+        case "rd": {
+          const middle = Math.round(modifiers[1].length / 2);
+
+          //  melee values + remove the {{}}
+          const meleeStringValue = modifiers[1]
+            .slice(0, middle)
+            .slice(2)
+            .slice(0, -2)
+            .split("|")[1]
+            .split(" ");
+          const rangedStringValue = modifiers[1]
+            .slice(middle + 1)
+            .slice(2)
+            .slice(0, -2)
+            .split("|")[1]
+            .split(" ");
+          const damageType = meleeStringValue[1].slice(0, -1);
+          passiveArray.push({
+            format: `${damageType}`,
+            range: "melee",
+            text: meleeStringValue[0],
+          });
+          passiveArray.push({
+            format: `${damageType}`,
+            range: "ranged",
+            text: rangedStringValue[0],
+          });
+          break;
+        }
+        case "as": {
+          //  might have to do some parsing
+          if (modifiers[1].includes("{{")) {
+            modifiers[1] = modifiers[1].replace("{{", "");
+          }
+          if (modifiers[1].includes("}}")) {
+            modifiers[1] = modifiers[1].replace("}}", "");
+          }
+          if (modifiers[1].includes("|")) {
+            const [formatType, rest] = modifiers[1].split("|");
+            passiveArray.push({ format: formatType, text: rest });
+          } else {
+            passiveArray.push({ format: modifiers[1], text: modifiers[1] });
+          }
+
+          break;
+        }
+        case "tip": {
+          //  not sure what to do with this yet
+          passiveArray.push({ format: "tip", text: modifiers[1] });
+          break;
+        }
+        case "fd": {
+          passiveArray.push({ format: "fd", text: modifiers[1] });
+          break;
+        }
+        default: {
+          console.log(
+            "--------------\n",
+            "DEFAULT ITEM option in prepStylize. This should not happen\n",
+            `START INDEX:${startIndex}\n`,
+            `END INDEX:${endIndex}\n`,
+            effects
+          );
+          console.log("MODIFIERS: \n", modifiers[0], "\n", modifiers[1]);
+          passiveArray.push({ format: "error", text: modifiers[1] });
+        }
+      }
     }
-    //  only other option should be "{"
-    //  remove the special character {{}}
-    const textItem = specialSyntax.slice(2);
-    const modifiers = [
-      textItem.slice(0, textItem.indexOf("|")),
-      textItem.slice(textItem.indexOf("|") + 1),
-    ];
 
-    switch (modifiers[0]) {
-      case "rd": {
-        const middle = Math.round(modifiers[1].length / 2);
-
-        //  melee values + remove the {{}}
-        const meleeStringValue = modifiers[1]
-          .slice(0, middle)
-          .slice(2)
-          .slice(0, -2)
-          .split("|")[1]
-          .split(" ");
-        const rangedStringValue = modifiers[1]
-          .slice(middle + 1)
-          .slice(2)
-          .slice(0, -2)
-          .split("|")[1]
-          .split(" ");
-        const damageType = meleeStringValue[1].slice(0, -1);
-        passiveArray.push({
-          format: `${damageType}`,
-          range: "melee",
-          text: meleeStringValue[0],
-        });
-        passiveArray.push({
-          format: `${damageType}`,
-          range: "ranged",
-          text: rangedStringValue[0],
-        });
-        break;
-      }
-      case "as": {
-        //  might have to do some parsing
-        if (modifiers[1].includes("{{")) {
-          modifiers[1] = modifiers[1].replace("{{", "");
-        }
-        if (modifiers[1].includes("}}")) {
-          modifiers[1] = modifiers[1].replace("}}", "");
-        }
-        if (modifiers[1].includes("|")) {
-          const [formatType, rest] = modifiers[1].split("|");
-          console.log("REST:", rest);
-          passiveArray.push({ format: formatType, text: rest });
-        } else {
-          passiveArray.push({ format: modifiers[1], text: modifiers[1] });
-        }
-
-        break;
-      }
-      case "tip": {
-        //  not sure what to do with this yet
-        passiveArray.push({ format: "tip", text: modifiers[1] });
-        break;
-      }
-      case "fd": {
-        passiveArray.push({ format: "fd", text: modifiers[1] });
-        break;
-      }
-      default: {
-        console.log(
-          "DEFAULT ITEM option in prepStylize. This should not happen",
-          startIndex,
-          endIndex,
-          effects
-        );
-        console.log("MODIFIERS: ", modifiers[0], modifiers[1]);
-        passiveArray.push({ format: "error", text: modifiers[1] });
-      }
-    }
-    console.log("EFFECTSLICE", effects.slice(endIndex + 2));
     effects = effects.slice(endIndex + 2); // add 2 to remove the last }} or ]]
   }
   //  add the remainer to the passive array
@@ -319,7 +316,6 @@ const numerize = (formattedPassives, currentStats) => {
           break;
         //  idk what to do with attack effect yet
         case "attack effect":
-          console.log("EACH EFFECT", eachEffect.text);
           text = eachEffect.text;
           break;
         case "fd":
@@ -360,7 +356,10 @@ const colorizeAndFinalize = (numerizedPassives) => {
         case "physical damage": {
           if (eachEffect.range && eachEffect.range === "melee") {
             return (
-              <span key={`${passiveName}_${index}`} className="text-red-800">
+              <span
+                key={`${passiveName}_${index}_melee`}
+                className="text-red-800"
+              >
                 {" "}
                 melee {eachEffect.text} /
               </span>
@@ -368,7 +367,10 @@ const colorizeAndFinalize = (numerizedPassives) => {
           }
           if (eachEffect.range && eachEffect.range === "ranged") {
             return (
-              <span key={`${passiveName}_${index}`} className="text-red-800">
+              <span
+                key={`${passiveName}_${index}_ranged`}
+                className="text-red-800"
+              >
                 {" "}
                 ranged {eachEffect.text}{" "}
               </span>
@@ -376,7 +378,10 @@ const colorizeAndFinalize = (numerizedPassives) => {
           }
           if (!eachEffect.range) {
             return (
-              <span key={`${passiveName}_${index}`} className="text-red-800">
+              <span
+                key={`${passiveName}_${index}_none`}
+                className="text-red-800"
+              >
                 {eachEffect.text}
               </span>
             );
@@ -386,16 +391,21 @@ const colorizeAndFinalize = (numerizedPassives) => {
 
         //  attack effect
         case "attack effect": {
-          return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
+          return (
+            <span key={`${passiveName}_${index}_ae`}>{eachEffect.text}</span>
+          );
         }
         //  specific tip effects
         case "tip effect": {
-          return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
+          return (
+            <span key={`${passiveName}_${index}_tip`}>{eachEffect.text}</span>
+          );
         }
         //  name
         case "name": {
           return (
             <div
+              key={`${passiveName}_${index}_name`}
               className={`font-bold ${eachEffect.isActive ? "text-gold-4" : "text-gold-1"}`}
             >
               {eachEffect.isActive && "Active - "}
@@ -405,11 +415,22 @@ const colorizeAndFinalize = (numerizedPassives) => {
         }
         //  normal
         case "normal": {
-          return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
+          return (
+            <span key={`${passiveName}_${index}_normal`}>
+              {eachEffect.text}
+            </span>
+          );
         }
         //  error case
         case "error": {
-          return <span className="text-red-500">{eachEffect.text}</span>;
+          return (
+            <span
+              key={`${passiveName}_${index}_error`}
+              className="text-orange-700"
+            >
+              {eachEffect.text}
+            </span>
+          );
         }
 
         //  default catch-all for errors
@@ -420,7 +441,11 @@ const colorizeAndFinalize = (numerizedPassives) => {
             "and text is ",
             eachEffect.text
           );
-          return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
+          return (
+            <span key={`${passiveName}_${index}_default`}>
+              {eachEffect.text}
+            </span>
+          );
         }
       }
       //
@@ -482,7 +507,6 @@ export const parseItemData = (championName, currentStats, itemData) => {
     currentStats
   );
   masterRes.passives = passives;
-  console.log("P", passives);
   masterRes.active = active;
   return masterRes;
 };
