@@ -96,7 +96,6 @@ export const reduxValidateInventory = (state, newItem) => {
 
 //  stylize the stats of an item
 export const stylizeStats = (statName, statValue) => {
-  console.log("SS", statName, statValue);
   const value = statValue.split(" ")[0];
   const progressionType = statValue.split(" ")[1];
   switch (statName) {
@@ -128,6 +127,75 @@ export const parseItemStats = (itemStats) => {
 //  ===============================================================
 //  Parse item descriptions to get number values
 
+//  find the beginning and end index of {{}} or [[]] for parsing item JSON
+const findStartEndIndex = (effectString) => {
+  //  define variables
+  let squareStartIndex = effectString.indexOf("[[");
+  let curlyStartIndex = effectString.indexOf("{{");
+  let startIndex;
+  let endIndex;
+  const counter = { "[[": 0, "{{": 0 };
+  //  pick the symbol that comes first
+  if (squareStartIndex !== -1 && curlyStartIndex !== -1) {
+    startIndex = Math.min(squareStartIndex, curlyStartIndex);
+    //  set the correct starting type
+    startIndex === squareStartIndex
+      ? (counter["[["] += 1)
+      : (counter["{{"] += 1);
+  } else if (squareStartIndex !== -1) {
+    startIndex = squareStartIndex;
+    counter["[["] += 1;
+  } else {
+    startIndex = curlyStartIndex;
+    counter["{{"] += 1;
+  }
+  effectString = effectString.slice(startIndex + 2);
+  endIndex = startIndex + 2;
+  while (counter["[["] > 0 || counter["{{"] > 0) {
+    //  reset start values
+    squareStartIndex = effectString.indexOf("[[");
+    curlyStartIndex = effectString.indexOf("{{");
+    const squareEndIndex = effectString.indexOf("]]");
+    const curlyEndIndex = effectString.indexOf("}}");
+    console.log(
+      squareStartIndex,
+      squareEndIndex,
+      curlyStartIndex,
+      curlyEndIndex
+    );
+    const indexes = [
+      squareStartIndex,
+      squareEndIndex,
+      curlyStartIndex,
+      curlyEndIndex,
+    ].filter((curr) => curr >= 0);
+    const minIndex = Math.min(...indexes);
+    switch (minIndex) {
+      case squareStartIndex:
+        counter["[["] += 1;
+        break;
+      case curlyStartIndex:
+        counter["{{"] += 1;
+        break;
+      case squareEndIndex:
+        counter["[["] -= 1;
+        break;
+      case curlyEndIndex:
+        counter["{{"] -= 1;
+        break;
+      default:
+        console.log("POTENTIAL ERROR IN FINDING START AND END INDEXES");
+        console.log(effectString);
+    }
+    endIndex += minIndex + 2;
+    console.log(counter);
+    console.log(effectString.slice(minIndex + 2));
+    console.log("--------------------");
+    effectString = effectString.slice(minIndex + 2);
+  }
+  return [startIndex, endIndex - 2];
+};
+
 //  STEP 1: Prep anything you have to remove from the item effect
 const prepStylize = (currentPassive, isActive = false) => {
   //  currentPassive is the Passive object
@@ -139,28 +207,7 @@ const prepStylize = (currentPassive, isActive = false) => {
   passiveArray.push({ format: "name", text: currentPassive.name, isActive });
 
   while (effects.indexOf("[[") !== -1 || effects.indexOf("{{") !== -1) {
-    const parenthesisStartIndex = effects.indexOf("[[");
-    const curlyStartIndex = effects.indexOf("{{");
-    const parenthesisEndIndex = effects.indexOf("]] ");
-    const curlyEndIndex = effects.indexOf("}} ");
-    let startIndex;
-    let endIndex;
-    //  pick the symbol that comes first
-    if (parenthesisStartIndex !== -1 && curlyStartIndex !== -1) {
-      startIndex = Math.min(parenthesisStartIndex, curlyStartIndex);
-    } else if (parenthesisStartIndex !== -1) {
-      startIndex = parenthesisStartIndex;
-    } else {
-      startIndex = curlyStartIndex;
-    }
-    //  the end of the special {{}} or [[]] is determined by empty space
-    if (parenthesisEndIndex !== -1 && curlyEndIndex !== -1) {
-      endIndex = Math.min(parenthesisEndIndex, curlyEndIndex);
-    } else if (parenthesisEndIndex !== -1) {
-      endIndex = parenthesisEndIndex;
-    } else {
-      endIndex = curlyEndIndex;
-    }
+    const [startIndex, endIndex] = findStartEndIndex(effects);
     //  const endIndex = startIndex + effects.slice(startIndex).indexOf(" ") + 1;
     //  take anything before the marker and
     passiveArray.push({
@@ -213,7 +260,21 @@ const prepStylize = (currentPassive, isActive = false) => {
         break;
       }
       case "as": {
-        passiveArray.push({ format: modifiers[1], text: modifiers[1] });
+        //  might have to do some parsing
+        if (modifiers[1].includes("{{")) {
+          modifiers[1] = modifiers[1].replace("{{", "");
+        }
+        if (modifiers[1].includes("}}")) {
+          modifiers[1] = modifiers[1].replace("}}", "");
+        }
+        if (modifiers[1].includes("|")) {
+          const [formatType, rest] = modifiers[1].split("|");
+          console.log("REST:", rest);
+          passiveArray.push({ format: formatType, text: rest });
+        } else {
+          passiveArray.push({ format: modifiers[1], text: modifiers[1] });
+        }
+
         break;
       }
       case "tip": {
@@ -221,14 +282,22 @@ const prepStylize = (currentPassive, isActive = false) => {
         passiveArray.push({ format: "tip", text: modifiers[1] });
         break;
       }
-      default:
+      case "fd": {
+        passiveArray.push({ format: "fd", text: modifiers[1] });
+        break;
+      }
+      default: {
         console.log(
           "DEFAULT ITEM option in prepStylize. This should not happen",
           startIndex,
           endIndex,
           effects
         );
+        console.log("MODIFIERS: ", modifiers[0], modifiers[1]);
+        passiveArray.push({ format: "error", text: modifiers[1] });
+      }
     }
+    console.log("EFFECTSLICE", effects.slice(endIndex + 2));
     effects = effects.slice(endIndex + 2); // add 2 to remove the last }} or ]]
   }
   //  add the remainer to the passive array
@@ -250,10 +319,15 @@ const numerize = (formattedPassives, currentStats) => {
           break;
         //  idk what to do with attack effect yet
         case "attack effect":
+          console.log("EACH EFFECT", eachEffect.text);
           text = eachEffect.text;
           break;
+        case "fd":
         case "name":
         case "normal":
+          text = eachEffect.text;
+          break;
+        case "error":
           text = eachEffect.text;
           break;
         //  default should generally not happen. is a catch all
@@ -268,7 +342,6 @@ const numerize = (formattedPassives, currentStats) => {
       return { ...eachEffect, text };
     })
   );
-  console.log("NPP", numerizedPassives);
   return numerizedPassives;
 };
 
@@ -334,6 +407,11 @@ const colorizeAndFinalize = (numerizedPassives) => {
         case "normal": {
           return <span key={`${passiveName}_${index}`}>{eachEffect.text}</span>;
         }
+        //  error case
+        case "error": {
+          return <span className="text-red-500">{eachEffect.text}</span>;
+        }
+
         //  default catch-all for errors
         default: {
           console.log(
@@ -395,7 +473,6 @@ export const parseItemData = (championName, currentStats, itemData) => {
   const statArray = Object.entries(parsedItemStats).map(([key, value]) =>
     stylizeStats(key, value)
   );
-  console.log("SA", statArray);
   masterRes.statArray = statArray;
   //  console.log(itemData);
   //  this following section is related to parsing item passive and actives

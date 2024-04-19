@@ -68,10 +68,10 @@ export default function HoverableItem({
                 <div className="text-gold-2 flex flex-row space-x-2">
                   <div className="w-5 h-5 relative">
                     <Image
-                      src={`/images/gold.png`}
-                      alt={`/images/gold.png`}
+                      src="/images/gold.png"
+                      alt="/images/gold.png"
                       layout="fill"
-                      key={`/images/gold.png`}
+                      key={`${itemData.name}-gold-icon`}
                     />
                   </div>
                   <div>{itemData.shop.prices.total} </div>

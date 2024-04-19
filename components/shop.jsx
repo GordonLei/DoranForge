@@ -227,7 +227,7 @@ export default function Shop({
                     src="/images/gold.png"
                     alt="/images/gold.png"
                     layout="fill"
-                    key="/images/gold.png"
+                    key={`${currItem.name}-shop-gold-icon`}
                   />
                 </div>
                 <div>{currItem.totalPrice} </div>
@@ -244,7 +244,7 @@ export default function Shop({
                   }
                   return (
                     <div
-                      key={`${index}-${currStatName}`}
+                      key={`${index}-${currStatName}-shop-view`}
                       className="flex flex-row space-x-2"
                     >
                       <div className="w-5 h-5 relative">
@@ -263,9 +263,13 @@ export default function Shop({
               </div>
               {/* Map through all the item passives */}
               <div className="mb-4">
-                {console.log("CIV@", currItem)}
-                {currItem.passives.map((currentPassive) => (
-                  <div key={`${currentPassive.name}`}>
+                {console.log(currItem.passives, currItem.passives.length)}
+                {currItem.passives.map((currentPassive, index) => (
+                  <div key={`${currentPassive.name}-shop-view`}>
+                    {console.log(
+                      "WHAT IS THIS: ",
+                      `${currentPassive.name}-${index}`
+                    )}
                     {currentPassive.text}
                   </div>
                 ))}
@@ -273,7 +277,9 @@ export default function Shop({
               {/* Map through all the item actives */}
               <div className="mb-4">
                 {currItem.active.map((currentActive) => (
-                  <div key={`${currentActive.name}`}>{currentActive.text}</div>
+                  <div key={`${currentActive.name}-shop-view`}>
+                    {currentActive.text}
+                  </div>
                 ))}
               </div>
               {/* Button Div */}
