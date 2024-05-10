@@ -281,6 +281,55 @@ const prepStylize = (currentPassive, isActive = false) => {
           passiveArray.push({ format: "fd", text: modifiers[1] });
           break;
         }
+        case "ft": {
+          //  Doran's Shield
+          if (currentPassive.name.toUpperCase() === "ENDURING FOCUS") {
+            const ppSplit = modifiers[1].split("|");
+            /*
+            66% effectiveness|
+            {{
+              pp|
+              0 to 45*0.66 for 11|
+              type='''current missing''' health|
+              color=health|
+              key1=%|
+              0 to 75|
+              formula=0.396 health regen for every 1% missing health
+            }}}} 
+            if owned by {{tip|ranged}}
+            */
+            //  going to ignore the percentages because it's kind of difficult to calculate
+            const newText = ` ${ppSplit[0]}`;
+            passiveArray.push({ format: "normal", text: newText });
+          }
+          //  default
+          else {
+            passiveArray.push({ format: "error", text: modifiers[1] });
+          }
+          break;
+        }
+        case "pp": {
+          //  Doran's Shield
+          if (currentPassive.name.toUpperCase() === "ENDURING FOCUS") {
+            const ppSplit = modifiers[1].split("|");
+            /*
+            0. 0 to 45 for 11|
+            1. type='''current missing''' health|
+            2. color=health|
+            3. key1=%|
+            4. 0 to 75|
+            5. formula=0.6 health regen for every 1% missing health
+            */
+            //  going to ignore the percentages because it's kind of difficult to calculate
+            const newText = `${ppSplit[0].split(" ").slice(0, 3).join(" ")} or (${ppSplit[5].substring(8)} up to 75% missing health)`;
+            passiveArray.push({ format: "health regeneration", text: newText });
+          }
+          //  default
+          else {
+            passiveArray.push({ format: "error", text: modifiers[1] });
+          }
+          break;
+        }
         default: {
           console.log(
             "--------------\n",
@@ -319,6 +368,7 @@ const numerize = (formattedPassives, currentStats) => {
           text = eachEffect.text;
           break;
         case "fd":
+        case "health regeneration":
         case "name":
         case "normal":
           text = eachEffect.text;
@@ -388,11 +438,27 @@ const colorizeAndFinalize = (numerizedPassives) => {
           }
           break;
         }
-
+        //  health regeneration
+        case "health regeneration": {
+          return (
+            <span
+              key={`${passiveName}_${index}_none`}
+              className="text-green-700"
+            >
+              {eachEffect.text}
+            </span>
+          );
+        }
         //  attack effect
         case "attack effect": {
+          let textColor = "";
+          if (eachEffect.text.includes("health regeneration")) {
+            textColor = "text-green-700";
+          }
           return (
-            <span key={`${passiveName}_${index}_ae`}>{eachEffect.text}</span>
+            <span key={`${passiveName}_${index}_ae`} className={`${textColor}`}>
+              {eachEffect.text}
+            </span>
           );
         }
         //  specific tip effects

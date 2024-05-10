@@ -46,10 +46,10 @@ export default function HextechNavbar() {
           <Link href="/" className="text-grey-1">
             <Image
               width={32}
-              alt="Hextech logo"
+              alt="HextechForge logo"
               src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/hextech-images/chest.png"
             />
-            <p className="font-bold text-inherit">Hextech</p>
+            <p className="font-bold text-inherit">HextechForge</p>
           </Link>
         </NavbarBrand>
       </NavbarContent>
