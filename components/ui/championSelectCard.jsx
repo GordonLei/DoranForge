@@ -34,6 +34,10 @@ export default function ChampionSelectCard({
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="rounded-md max-h-80 max-w-40"
+          onError={(event) => {
+            event.target.id = "public/images/temp_openInventory.png";
+            event.target.srcset = "public/images/temp_openInventory.png";
+          }}
         />
         <div className="w-full max-w-40 max-h-16 p-2 absolute bottom-0 left-0 flex flex-row bg-blue-4 z-40 items-center justify-center rounded-b-md border-b">
           <Image

@@ -24,12 +24,18 @@ export const getChampionInfo = async (patchVersion, name) => {
     .then((response) => {
       //  ideally something to save the data into a file + folder
       const { data } = response;
-      //    for now, just check if the patchVersion matches the version from merakianalytics
-      if (data.icon.split("/")[4] === patchVersion) {
+      console.log("Patch number is ", data.icon.split("/")[4]);
+      //    for now, just check if the patchVersion matches the version from merakianalytics or 14.7.1
+      if (
+        data.icon.split("/")[4] === patchVersion ||
+        data.icon.split("/")[4] === "14.9.1" ||
+        data.icon.split("/")[4] === "14.7.1" ||
+        data.icon.split("/")[4] > "14.0.1"
+      ) {
         return data;
       }
       throw new Error(
-        "need to consult Merakianalytics; might be a mismatch in Patch # + need to update"
+        `need to consult Merakianalytics; might be a mismatch in Patch # + need to update. current URL is: "http://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/champions/${name}.json"`
       );
     })
     .catch((err) => {

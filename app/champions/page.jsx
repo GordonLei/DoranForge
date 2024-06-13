@@ -14,7 +14,6 @@ export const dynamic = "force-static";
 //  migrated getStaticProps to app router (changed name to getStaticData)
 const getStaticData = async () => {
   const championInfo = await getChampionImages(process.env.leaguePatch);
-
   // Pass data to the page via props
   return { props: { championInfo } };
 };
