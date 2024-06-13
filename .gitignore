@@ -45,4 +45,3 @@ next.config.js
 .env
 data/*
 json/*
-public/fonts/*
