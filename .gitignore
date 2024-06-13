@@ -42,5 +42,4 @@ jspm_packages
 
 # stuff I added to the project that should be ignored
 .env
-data/*
-json/*
+

@@ -1,7 +1,7 @@
 module.exports = {
   env: {
     //  dataDragon
-    leaguePatch: "14.12.1",
+    leaguePatch: "14.4.1",
   },
   eslint: {
     ignoreDuringBuilds: true,
