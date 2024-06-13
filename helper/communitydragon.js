@@ -12,9 +12,11 @@ Retrieve data from ddragon's champion.json
 */
 export const getAllChampionJson = async () => {
   let championData;
+  console.log("CWD is:", process.cwd());
   //
   const latestChampionJsonURL = `${process.cwd()}/data/lolstaticdata/${process.env.leaguePatch}/champions.json`;
   if (existsSync(latestChampionJsonURL)) {
+    console.log("in if statement");
     const data = readFileSync(latestChampionJsonURL);
     championData = JSON.parse(data);
     // Pass data to the page via props
@@ -47,7 +49,9 @@ Return an array with the IDs of the Champions from champions.json
 Champion ID is the parsed name 
 */
 export const getChampionImages = async (patchVersion) => {
+  console.log("In get champion Images");
   const data = await getAllChampionJson(patchVersion);
+  console.log("retrieved data in get champion Images");
   const idArray = [];
   for (const key of Object.keys(data)) {
     idArray.push({
@@ -57,5 +61,6 @@ export const getChampionImages = async (patchVersion) => {
       defaultLoadingScreenPath: data[key].skins[0].loadScreenPath,
     });
   }
+  console.log("Completed get champion Images");
   return idArray;
 };
