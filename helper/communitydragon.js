@@ -24,7 +24,10 @@ export const getAllChampionJson = async () => {
     const lolStaticDataChampionJsonURL = `http://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/champions.json`;
     championData = axios
       .get(lolStaticDataChampionJsonURL)
-      .then((response) => response.data.data)
+      .then((response) => {
+        console.log(response.data);
+        return response.data.data;
+      })
       .catch((err) => {
         console.log(
           "==========\n",
