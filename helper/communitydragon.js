@@ -51,7 +51,7 @@ Champion ID is the parsed name
 export const getChampionImages = async (patchVersion) => {
   console.log("In get champion Images");
   const data = await getAllChampionJson(patchVersion);
-  console.log("retrieved data in get champion Images");
+  console.log("retrieved data in get champion Images", data);
   const idArray = [];
   for (const key of Object.keys(data)) {
     idArray.push({
